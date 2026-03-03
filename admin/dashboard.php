@@ -10,3 +10,5 @@ if(!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
 <a href="logout.php">Logout</a>
 <br><br>
 <a href="tarif.php">Kelola Tarif</a>
+<br>
+<a href="kurir.php">Kelola Kurir</a>
