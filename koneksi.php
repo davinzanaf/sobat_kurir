@@ -10,7 +10,7 @@ $koneksi = mysqli_connect($host, $user, $password, $database);
 
 // Mengecek apakah sambungan berhasil atau gagal
 if (!$koneksi) {
-    die("Aduh! Gagal tersambung ke database: " . mysqli_connect_error());
+    die("Aduh! Gagal tersambung ke database: " . mysqli_connect_error()); 
 } else {
     echo "Mantap! Database Sobat Kurir berhasil tersambung!";
 }
