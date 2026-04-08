@@ -1,43 +1,21 @@
-<?php
-include "../config/koneksi.php";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer - Sobat Kurir</title>
+</head>
+<body>
 
-$hasil = null;
+    <h2>Halaman Customer - Sobat Kurir</h2>
 
-if(isset($_POST['cek'])) {
-    $asal = $_POST['asal'];
-    $tujuan = $_POST['tujuan'];
-    $berat = $_POST['berat'];
+    <p>Selamat datang di layanan Sobat Kurir.</p>
+    <p>Silakan pilih menu di bawah ini:</p>
 
-    $query = mysqli_query($conn, 
-        "SELECT * FROM tabel_tarif 
-         WHERE kecamatan_asal='$asal' 
-         AND kecamatan_tujuan='$tujuan'");
+    <ul>
+        <li><a href="cek_ongkir.php">Cek Ongkir</a></li>
+        <li><a href="buat_pesanan.php">Buat Pesanan</a></li>
+        <li><a href="tracking.php">Cek Tracking</a></li>
+    </ul>
 
-    $data = mysqli_fetch_assoc($query);
-
-    if($data) {
-        $total = $berat * $data['harga_per_kg'];
-        $hasil = "Total Ongkir: Rp " . number_format($total, 0, ',', '.');
-    } else {
-        $hasil = "Tarif tidak ditemukan.";
-    }
-}
-?>
-
-<h2>Cek Ongkir Sobat Kurir</h2>
-
-<form method="POST">
-    <input type="text" name="asal" placeholder="Kecamatan Asal" required><br><br>
-    <input type="text" name="tujuan" placeholder="Kecamatan Tujuan" required><br><br>
-    <input type="number" name="berat" placeholder="Berat (kg)" required><br><br>
-    <button type="submit" name="cek">Cek Ongkir</button>
-    <a href="tracking.php">Cek Tracking</a>
-</form>
-
-<br>
-
-<?php 
-if($hasil) {
-    echo "<h3>$hasil</h3>";
-}
-?>
+</body>
+</html>
