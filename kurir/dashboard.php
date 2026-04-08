@@ -7,9 +7,17 @@ if(!isset($_SESSION['role']) || $_SESSION['role'] != 'kurir') {
     exit;
 }
 
-$data = mysqli_query($conn, 
-    "SELECT * FROM tabel_pesanan 
-     WHERE status_pesanan='MENUNGGU_KURIR'");
+$id_kurir = $_SESSION['id_user'];
+
+$data_baru = mysqli_query($conn,
+    "SELECT * FROM tabel_pesanan
+     WHERE status_pesanan='MENUNGGU_KURIR'
+     ORDER BY id_pesanan DESC");
+
+$data_saya = mysqli_query($conn,
+    "SELECT * FROM tabel_pesanan
+     WHERE id_kurir='$id_kurir'
+     ORDER BY id_pesanan DESC");
 ?>
 
 <h2>Dashboard Kurir</h2>
@@ -21,35 +29,79 @@ $data = mysqli_query($conn,
 
 <h3>Daftar Tugas Baru</h3>
 
-<table border="1" cellpadding="10">
-<tr>
-    <th>Kode Resi</th>
-    <th>Pengirim</th>
-    <th>Penerima</th>
-    <th>Total</th>
-    <th>Metode</th>
-    <th>Aksi</th>
-</tr>
+<table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+        <th>Kode Resi</th>
+        <th>Pengirim</th>
+        <th>Penerima</th>
+        <th>Total</th>
+        <th>Metode</th>
+        <th>Aksi</th>
+    </tr>
 
-<?php
-while($row = mysqli_fetch_assoc($data)) {
+    <?php
+    if(mysqli_num_rows($data_baru) > 0) {
+        while($row = mysqli_fetch_assoc($data_baru)) {
 
-    $label_cod = "";
-    if($row['metode_pembayaran'] == "COD") {
-        $label_cod = "<span style='color:red; font-weight:bold;'> (COD)</span>";
+            $label_cod = "";
+            if($row['metode_pembayaran'] == "COD") {
+                $label_cod = "<span style='color:red; font-weight:bold;'>(COD)</span>";
+            }
+
+            echo "<tr>
+                    <td>{$row['kode_resi']}</td>
+                    <td>{$row['nama_pengirim']}</td>
+                    <td>{$row['nama_penerima']}</td>
+                    <td>Rp " . number_format($row['total_harga'], 0, ',', '.') . "</td>
+                    <td>{$row['metode_pembayaran']} $label_cod</td>
+                    <td>
+                        <a href='update_status.php?id={$row['id_pesanan']}&aksi=ambil'
+                           onclick=\"return confirm('Yakin ingin mengambil pesanan ini?')\">
+                           Ambil Pesanan
+                        </a>
+                    </td>
+                  </tr>";
+        }
+    } else {
+        echo "<tr><td colspan='6'>Belum ada tugas baru.</td></tr>";
     }
+    ?>
+</table>
 
-    echo "<tr>
-            <td>{$row['kode_resi']}</td>
-            <td>{$row['nama_pengirim']}</td>
-            <td>{$row['nama_penerima']}</td>
-            <td>Rp ".number_format($row['total_harga'],0,',','.')."</td>
-            <td>{$row['metode_pembayaran']} $label_cod</td>
-            <td>
-                <a href='update_status.php?id={$row['id_pesanan']}&aksi=ambil' onclick=\"return confirm('Ambil pesanan ini?')\">Ambil Pesanan</a>
-            </td>
-          </tr>";
-}
-?>
+<hr>
 
+<h3>Pesanan Saya</h3>
+
+<table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+        <th>Kode Resi</th>
+        <th>Pengirim</th>
+        <th>Penerima</th>
+        <th>Total</th>
+        <th>Metode</th>
+        <th>Status</th>
+    </tr>
+
+    <?php
+    if(mysqli_num_rows($data_saya) > 0) {
+        while($row = mysqli_fetch_assoc($data_saya)) {
+
+            $label_cod = "";
+            if($row['metode_pembayaran'] == "COD") {
+                $label_cod = "<span style='color:red; font-weight:bold;'>(COD)</span>";
+            }
+
+            echo "<tr>
+                    <td>{$row['kode_resi']}</td>
+                    <td>{$row['nama_pengirim']}</td>
+                    <td>{$row['nama_penerima']}</td>
+                    <td>Rp " . number_format($row['total_harga'], 0, ',', '.') . "</td>
+                    <td>{$row['metode_pembayaran']} $label_cod</td>
+                    <td>{$row['status_pesanan']}</td>
+                  </tr>";
+        }
+    } else {
+        echo "<tr><td colspan='6'>Belum ada pesanan yang Anda ambil.</td></tr>";
+    }
+    ?>
 </table>
