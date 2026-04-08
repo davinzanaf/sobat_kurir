@@ -81,7 +81,23 @@ $tracking = mysqli_query($conn, "SELECT * FROM tabel_tracking
         <td><?php echo $data['status_pesanan']; ?></td>
     </tr>
 </table>
+    <br>
 
+    <?php if($data['status_pesanan'] == 'DIJEMPUT') { ?>
+        <a href="update_status.php?id=<?php echo $data['id_pesanan']; ?>&aksi=kirim"
+        onclick="return confirm('Yakin pesanan ini sedang dikirim?')">
+        Kirim Pesanan
+        </a>
+    <?php } ?>
+
+    <?php if($data['status_pesanan'] == 'DALAM_PENGIRIMAN') { ?>
+        <a href="update_status.php?id=<?php echo $data['id_pesanan']; ?>&aksi=selesai"
+        onclick="return confirm('Yakin pesanan ini sudah selesai?')">
+        Selesaikan Pesanan
+        </a>
+    <?php } ?>
+
+    <br><br>
 <br>
 
 <h3>Riwayat Tracking</h3>
