@@ -31,6 +31,7 @@ if(isset($_POST['cek'])) {
     <input type="text" name="tujuan" placeholder="Kecamatan Tujuan" required><br><br>
     <input type="number" name="berat" placeholder="Berat (kg)" required><br><br>
     <button type="submit" name="cek">Cek Ongkir</button>
+    <a href="tracking.php">Cek Tracking</a>
 </form>
 
 <br>
