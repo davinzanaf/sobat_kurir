@@ -80,6 +80,7 @@ $data_saya = mysqli_query($conn,
         <th>Total</th>
         <th>Metode</th>
         <th>Status</th>
+        <th>Aksi</th>
     </tr>
 
     <?php
@@ -98,10 +99,13 @@ $data_saya = mysqli_query($conn,
                     <td>Rp " . number_format($row['total_harga'], 0, ',', '.') . "</td>
                     <td>{$row['metode_pembayaran']} $label_cod</td>
                     <td>{$row['status_pesanan']}</td>
+                    <td>
+                        <a href='detail_pesanan.php?id={$row['id_pesanan']}'>Detail</a>
+                    </td>
                   </tr>";
         }
     } else {
-        echo "<tr><td colspan='6'>Belum ada pesanan yang Anda ambil.</td></tr>";
+        echo "<tr><td colspan='7'>Belum ada pesanan yang Anda ambil.</td></tr>";
     }
     ?>
 </table>
