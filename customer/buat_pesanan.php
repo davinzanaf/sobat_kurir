@@ -13,12 +13,15 @@ if(isset($_POST['buat'])) {
     $hp_penerima = $_POST['hp_penerima'];
     $alamat_penerima = $_POST['alamat_penerima'];
 
-    $asal = $_POST['asal'];
-    $tujuan = $_POST['tujuan'];
-    $berat = $_POST['berat'];
-    $metode = $_POST['metode'];
+$asal = $_POST['asal'];
+$tujuan = $_POST['tujuan'];
+$berat = (float) $_POST['berat'];
+$metode = $_POST['metode'];
 
-    // Ambil tarif
+if($berat <= 0) {
+    $pesan = "Berat harus lebih dari 0.";
+} else {
+
     $query = mysqli_query($conn, 
         "SELECT * FROM tabel_tarif 
          WHERE kecamatan_asal='$asal' 
@@ -29,7 +32,6 @@ if(isset($_POST['buat'])) {
 
         $total = $berat * $data['harga_per_kg'];
 
-        // Buat kode resi unik
         $kode_resi = "SK" . date("YmdHis") . rand(10,99);
 
         mysqli_query($conn, "INSERT INTO tabel_pesanan 
@@ -45,6 +47,7 @@ if(isset($_POST['buat'])) {
     } else {
         $pesan = "Tarif tidak ditemukan.";
     }
+}
 }
 ?>
 
@@ -64,7 +67,7 @@ if(isset($_POST['buat'])) {
     <h3>Detail Pengiriman</h3>
     <input type="text" name="asal" placeholder="Kecamatan Asal" required><br><br>
     <input type="text" name="tujuan" placeholder="Kecamatan Tujuan" required><br><br>
-    <input type="number" name="berat" placeholder="Berat (kg)" required><br><br>
+    <input type="number" name="berat" placeholder="Berat (kg)" step="0.01" min="1" required><br><br>
 
     <select name="metode" required>
         <option value="COD">Bayar Tunai ke Kurir (COD)</option>

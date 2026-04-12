@@ -24,7 +24,7 @@ $query = mysqli_query($conn, "
 <body>
 
     <h2>Data Pesanan</h2>
-    <p>Selamat datang, <?php echo $_SESSION['nama']; ?></p>
+    <p>Selamat datang, <?php echo isset($_SESSION['nama_lengkap']) ? $_SESSION['nama_lengkap'] : 'Admin'; ?></p>
 
     <a href="dashboard.php">Kembali ke Dashboard</a> |
     <a href="logout.php">Logout</a>
