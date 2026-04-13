@@ -7,64 +7,114 @@ if(!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     exit;
 }
 
-// Tambah Kurir
-if(isset($_POST['tambah'])) {
-    $nama = $_POST['nama'];
+/* TAMBAH KURIR */
+if(isset($_POST['simpan'])) {
+    $nama_lengkap = $_POST['nama_lengkap'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $no_hp = $_POST['no_hp'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $role = 'kurir';
 
-    mysqli_query($conn, "INSERT INTO tabel_users 
-        (nama_lengkap, email, password, no_hp, role)
-        VALUES 
-        ('$nama', '$email', '$password', '$no_hp', 'kurir')");
+    mysqli_query($conn, "INSERT INTO tabel_users (nama_lengkap, email, password, no_hp, role)
+                         VALUES ('$nama_lengkap', '$email', '$password', '$no_hp', '$role')");
+
+    header("Location: kurir.php");
+    exit;
 }
 
-// Hapus Kurir
+/* HAPUS KURIR */
 if(isset($_GET['hapus'])) {
-    $id = $_GET['hapus'];
-    mysqli_query($conn, "DELETE FROM tabel_users WHERE id_user='$id' AND role='kurir'");
+    $id_user = (int) $_GET['hapus'];
+
+    // Lepaskan dulu relasi pesanan ke kurir ini
+    mysqli_query($conn, "UPDATE tabel_pesanan SET id_kurir = NULL WHERE id_kurir='$id_user'");
+
+    // Baru hapus kurir
+    mysqli_query($conn, "DELETE FROM tabel_users WHERE id_user='$id_user' AND role='kurir'");
+
+    header("Location: kurir.php");
+    exit;
 }
+
+/* TAMPIL DATA KURIR */
+$data_kurir = mysqli_query($conn, "SELECT * FROM tabel_users WHERE role='kurir' ORDER BY id_user DESC");
 ?>
 
-<h2>Manajemen Kurir</h2>
-<a href="dashboard.php">Kembali ke Dashboard</a>
-<br><br>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kelola Kurir</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
 
-<h3>Tambah Kurir</h3>
-<form method="POST">
-    <input type="text" name="nama" placeholder="Nama Lengkap" required><br><br>
-    <input type="email" name="email" placeholder="Email" required><br><br>
-    <input type="text" name="no_hp" placeholder="No HP" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-    <button type="submit" name="tambah">Tambah Kurir</button>
-</form>
+    <h2>Kelola Kurir</h2>
+    <p>Selamat datang, <?php echo isset($_SESSION['nama_lengkap']) ? $_SESSION['nama_lengkap'] : 'Admin'; ?></p>
 
-<hr>
+    <a href="dashboard.php">Kembali ke Dashboard</a>
+    <a href="logout.php">Logout</a>
 
-<h3>Daftar Kurir</h3>
+    <hr>
 
-<table border="1" cellpadding="10">
-<tr>
-    <th>Nama</th>
-    <th>Email</th>
-    <th>No HP</th>
-    <th>Aksi</th>
-</tr>
+    <h3>Tambah Kurir</h3>
 
-<?php
-$data = mysqli_query($conn, "SELECT * FROM tabel_users WHERE role='kurir'");
+    <form method="POST">
+        <label>Nama Lengkap</label>
+        <input type="text" name="nama_lengkap" required>
 
-while($row = mysqli_fetch_assoc($data)) {
-    echo "<tr>
-            <td>{$row['nama_lengkap']}</td>
-            <td>{$row['email']}</td>
-            <td>{$row['no_hp']}</td>
-            <td>
-                <a href='?hapus={$row['id_user']}' onclick=\"return confirm('Yakin hapus?')\">Hapus</a>
-            </td>
-          </tr>";
-}
-?>
+        <label>Email</label>
+        <input type="email" name="email" required>
 
-</table>
+        <label>No HP</label>
+        <input type="text" name="no_hp" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit" name="simpan">Simpan Kurir</button>
+    </form>
+
+    <hr>
+
+    <h3>Data Kurir</h3>
+
+    <table>
+        <tr>
+            <th>No</th>
+            <th>Nama Lengkap</th>
+            <th>Email</th>
+            <th>No HP</th>
+            <th>Role</th>
+            <th>Dibuat</th>
+            <th>Aksi</th>
+        </tr>
+
+        <?php
+        $no = 1;
+        if(mysqli_num_rows($data_kurir) > 0) {
+            while($row = mysqli_fetch_assoc($data_kurir)) {
+                echo "<tr>
+                        <td>$no</td>
+                        <td>{$row['nama_lengkap']}</td>
+                        <td>{$row['email']}</td>
+                        <td>{$row['no_hp']}</td>
+                        <td>{$row['role']}</td>
+                        <td>{$row['created_at']}</td>
+                        <td>
+                            <a class='btn' href='kurir.php?hapus={$row['id_user']}'
+                               onclick=\"return confirm('Yakin ingin menghapus kurir ini?')\">Hapus</a>
+                        </td>
+                      </tr>";
+                $no++;
+            }
+        } else {
+            echo "<tr><td colspan='7'>Belum ada data kurir</td></tr>";
+        }
+        ?>
+    </table>
+
+</div>
+</body>
+</html>
