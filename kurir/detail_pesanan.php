@@ -31,11 +31,21 @@ $tracking = mysqli_query($conn, "SELECT * FROM tabel_tracking
                                  ORDER BY id_tracking DESC");
 ?>
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail Pesanan</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
 <h2>Detail Pesanan</h2>
 <a href="dashboard.php">Kembali ke Dashboard</a>
 <hr>
 
-<table border="1" cellpadding="10" cellspacing="0">
+<table>
     <tr>
         <td><b>Kode Resi</b></td>
         <td><?php echo $data['kode_resi']; ?></td>
@@ -81,28 +91,28 @@ $tracking = mysqli_query($conn, "SELECT * FROM tabel_tracking
         <td><?php echo $data['status_pesanan']; ?></td>
     </tr>
 </table>
-    <br>
 
-    <?php if($data['status_pesanan'] == 'DIJEMPUT') { ?>
-        <a href="update_status.php?id=<?php echo $data['id_pesanan']; ?>&aksi=kirim"
-        onclick="return confirm('Yakin pesanan ini sedang dikirim?')">
-        Kirim Pesanan
-        </a>
-    <?php } ?>
-
-    <?php if($data['status_pesanan'] == 'DALAM_PENGIRIMAN') { ?>
-        <a href="update_status.php?id=<?php echo $data['id_pesanan']; ?>&aksi=selesai"
-        onclick="return confirm('Yakin pesanan ini sudah selesai?')">
-        Selesaikan Pesanan
-        </a>
-    <?php } ?>
-
-    <br><br>
 <br>
+
+<?php if($data['status_pesanan'] == 'DIJEMPUT') { ?>
+    <a class="btn" href="update_status.php?id=<?php echo $data['id_pesanan']; ?>&aksi=kirim"
+       onclick="return confirm('Yakin pesanan ini sedang dikirim?')">
+       Kirim Pesanan
+    </a>
+<?php } ?>
+
+<?php if($data['status_pesanan'] == 'DALAM_PENGIRIMAN') { ?>
+    <a class="btn" href="update_status.php?id=<?php echo $data['id_pesanan']; ?>&aksi=selesai"
+       onclick="return confirm('Yakin pesanan ini sudah selesai?')">
+       Selesaikan Pesanan
+    </a>
+<?php } ?>
+
+<br><br>
 
 <h3>Riwayat Tracking</h3>
 
-<table border="1" cellpadding="10" cellspacing="0">
+<table>
     <tr>
         <th>No</th>
         <th>Keterangan</th>
@@ -125,3 +135,7 @@ $tracking = mysqli_query($conn, "SELECT * FROM tabel_tracking
     }
     ?>
 </table>
+
+</div>
+</body>
+</html>

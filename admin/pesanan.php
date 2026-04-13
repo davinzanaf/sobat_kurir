@@ -20,18 +20,20 @@ $query = mysqli_query($conn, "
 <head>
     <meta charset="UTF-8">
     <title>Data Pesanan Admin</title>
+    <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
+<div class="container">
 
     <h2>Data Pesanan</h2>
     <p>Selamat datang, <?php echo isset($_SESSION['nama_lengkap']) ? $_SESSION['nama_lengkap'] : 'Admin'; ?></p>
 
-    <a href="dashboard.php">Kembali ke Dashboard</a> |
+    <a href="dashboard.php">Kembali ke Dashboard</a>
     <a href="logout.php">Logout</a>
 
     <hr>
 
-    <table border="1" cellpadding="10" cellspacing="0">
+    <table>
         <tr>
             <th>No</th>
             <th>Kode Resi</th>
@@ -52,13 +54,18 @@ $query = mysqli_query($conn, "
                     $nama_kurir = "Belum diambil";
                 }
 
+                $label_cod = "";
+                if($row['metode_pembayaran'] == "COD") {
+                    $label_cod = "<span class='badge-cod'>(COD)</span>";
+                }
+
                 echo "<tr>
                         <td>$no</td>
                         <td>{$row['kode_resi']}</td>
                         <td>{$row['nama_pengirim']}</td>
                         <td>{$row['nama_penerima']}</td>
                         <td>Rp " . number_format($row['total_harga'], 0, ',', '.') . "</td>
-                        <td>{$row['metode_pembayaran']}</td>
+                        <td>{$row['metode_pembayaran']} $label_cod</td>
                         <td>{$row['status_pesanan']}</td>
                         <td>{$nama_kurir}</td>
                       </tr>";
@@ -70,5 +77,6 @@ $query = mysqli_query($conn, "
         ?>
     </table>
 
+</div>
 </body>
 </html>

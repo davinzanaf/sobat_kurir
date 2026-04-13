@@ -13,20 +13,35 @@ if(isset($_POST['login'])) {
         $_SESSION['id_user'] = $data['id_user'];
         $_SESSION['role'] = $data['role'];
         $_SESSION['nama'] = $data['nama_lengkap'];
+
         header("Location: dashboard.php");
         exit;
     } else {
-        $error = "Email atau Password salah!";
+        $error = "Email atau password salah!";
     }
 }
 ?>
 
-<h2>Login Kurir</h2>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Kurir</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+    <h2>Login Kurir</h2>
 
-<?php if(isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
+    <?php if(isset($error)) { ?>
+        <div class="error-box"><?php echo $error; ?></div>
+    <?php } ?>
 
-<form method="POST">
-    <input type="email" name="email" placeholder="Email" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-    <button type="submit" name="login">Login</button>
-</form>
+    <form method="POST">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit" name="login">Login</button>
+    </form>
+</div>
+</body>
+</html>

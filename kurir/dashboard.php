@@ -20,6 +20,16 @@ $data_saya = mysqli_query($conn,
      ORDER BY id_pesanan DESC");
 ?>
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Kurir</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
 <h2>Dashboard Kurir</h2>
 <p>Selamat datang, <?php echo $_SESSION['nama']; ?></p>
 
@@ -29,7 +39,7 @@ $data_saya = mysqli_query($conn,
 
 <h3>Daftar Tugas Baru</h3>
 
-<table border="1" cellpadding="10" cellspacing="0">
+<table>
     <tr>
         <th>Kode Resi</th>
         <th>Pengirim</th>
@@ -45,7 +55,7 @@ $data_saya = mysqli_query($conn,
 
             $label_cod = "";
             if($row['metode_pembayaran'] == "COD") {
-                $label_cod = "<span style='color:red; font-weight:bold;'>(COD)</span>";
+                $label_cod = "<span class='badge-cod'>(COD)</span>";
             }
 
             echo "<tr>
@@ -55,7 +65,7 @@ $data_saya = mysqli_query($conn,
                     <td>Rp " . number_format($row['total_harga'], 0, ',', '.') . "</td>
                     <td>{$row['metode_pembayaran']} $label_cod</td>
                     <td>
-                        <a href='update_status.php?id={$row['id_pesanan']}&aksi=ambil'
+                        <a class='btn' href='update_status.php?id={$row['id_pesanan']}&aksi=ambil'
                            onclick=\"return confirm('Yakin ingin mengambil pesanan ini?')\">
                            Ambil Pesanan
                         </a>
@@ -72,7 +82,7 @@ $data_saya = mysqli_query($conn,
 
 <h3>Pesanan Saya</h3>
 
-<table border="1" cellpadding="10" cellspacing="0">
+<table>
     <tr>
         <th>Kode Resi</th>
         <th>Pengirim</th>
@@ -89,7 +99,7 @@ $data_saya = mysqli_query($conn,
 
             $label_cod = "";
             if($row['metode_pembayaran'] == "COD") {
-                $label_cod = "<span style='color:red; font-weight:bold;'>(COD)</span>";
+                $label_cod = "<span class='badge-cod'>(COD)</span>";
             }
 
             echo "<tr>
@@ -100,7 +110,7 @@ $data_saya = mysqli_query($conn,
                     <td>{$row['metode_pembayaran']} $label_cod</td>
                     <td>{$row['status_pesanan']}</td>
                     <td>
-                        <a href='detail_pesanan.php?id={$row['id_pesanan']}'>Detail</a>
+                        <a class='btn' href='detail_pesanan.php?id={$row['id_pesanan']}'>Detail</a>
                     </td>
                   </tr>";
         }
@@ -109,3 +119,7 @@ $data_saya = mysqli_query($conn,
     }
     ?>
 </table>
+
+</div>
+</body>
+</html>

@@ -38,8 +38,10 @@ if(isset($_POST['cek'])) {
 <head>
     <meta charset="UTF-8">
     <title>Cek Ongkir</title>
+    <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
+<div class="container">
 
     <h2>Cek Ongkir</h2>
     <a href="index.php">Kembali ke Beranda</a>
@@ -47,32 +49,16 @@ if(isset($_POST['cek'])) {
     <hr>
 
     <form method="POST">
-        <table>
-            <tr>
-                <td>Kecamatan Asal</td>
-                <td>
-                    <input type="text" name="kecamatan_asal" value="<?php echo $kecamatan_asal; ?>" required>
-                </td>
-            </tr>
-            <tr>
-                <td>Kecamatan Tujuan</td>
-                <td>
-                    <input type="text" name="kecamatan_tujuan" value="<?php echo $kecamatan_tujuan; ?>" required>
-                </td>
-            </tr>
-            <tr>
-                <td>Berat (kg)</td>
-                <td>
-                    <input type="number" name="berat" value="<?php echo $berat; ?>" required>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <button type="submit" name="cek">Cek Ongkir</button>
-                </td>
-            </tr>
-        </table>
+        <label>Kecamatan Asal</label>
+        <input type="text" name="kecamatan_asal" value="<?php echo $kecamatan_asal; ?>" required>
+
+        <label>Kecamatan Tujuan</label>
+        <input type="text" name="kecamatan_tujuan" value="<?php echo $kecamatan_tujuan; ?>" required>
+
+        <label>Berat (kg)</label>
+        <input type="number" name="berat" value="<?php echo $berat; ?>" step="0.01" min="1" required>
+
+        <button type="submit" name="cek">Cek Ongkir</button>
     </form>
 
     <hr>
@@ -80,7 +66,7 @@ if(isset($_POST['cek'])) {
     <?php if(isset($_POST['cek'])) { ?>
         <?php if($hasil) { ?>
             <h3>Hasil Cek Ongkir</h3>
-            <table border="1" cellpadding="10" cellspacing="0">
+            <table>
                 <tr>
                     <td><b>Kecamatan Asal</b></td>
                     <td><?php echo $hasil['kecamatan_asal']; ?></td>
@@ -103,9 +89,10 @@ if(isset($_POST['cek'])) {
                 </tr>
             </table>
         <?php } else { ?>
-            <p><b>Tarif tidak ditemukan.</b></p>
+            <div class="error-box">Tarif tidak ditemukan.</div>
         <?php } ?>
     <?php } ?>
 
+</div>
 </body>
 </html>
