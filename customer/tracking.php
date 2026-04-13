@@ -32,7 +32,7 @@ if(isset($_POST['cek'])) {
 <div class="container">
 
     <h2>Cek Tracking Pesanan</h2>
-    <a href="index.php">Kembali ke Beranda</a>
+    <a href="dashboard.php">Kembali ke Beranda</a>
 
     <hr>
 

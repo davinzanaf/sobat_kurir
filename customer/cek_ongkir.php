@@ -51,7 +51,7 @@ if(isset($_POST['cek'])) {
 <div class="container">
 
     <h2>Cek Ongkir</h2>
-    <a href="index.php">Kembali ke Beranda</a>
+    <a href="dashboard.php">Kembali ke Beranda</a>
 
     <hr>
 

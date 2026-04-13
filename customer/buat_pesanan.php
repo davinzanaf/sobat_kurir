@@ -77,7 +77,7 @@ if(isset($_POST['buat'])) {
 <div class="container">
 
     <h2>Buat Pesanan</h2>
-    <a href="index.php">Kembali ke Beranda</a>
+    <a href="dashboard.php">Kembali ke Beranda</a>
 
     <hr>
 
