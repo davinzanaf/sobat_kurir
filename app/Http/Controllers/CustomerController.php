@@ -104,7 +104,7 @@ class CustomerController extends Controller
             'kecamatan_asal' => ['required', 'string'],
             'kecamatan_tujuan' => ['required', 'string'],
             'berat' => ['required', 'numeric', 'min:1'],
-            'metode_pembayaran' => ['required', 'in:COD,TRANSFER'],
+            'metode_pembayaran' => ['required', 'in:TRANSFER,COD'],
         ]);
 
         $tarif = Tarif::where('kecamatan_asal', $request->kecamatan_asal)
@@ -123,6 +123,10 @@ class CustomerController extends Controller
 
         $kodeResi = 'SK' . now()->format('YmdHis') . strtoupper(Str::random(4));
 
+        $statusPembayaran = $request->metode_pembayaran === 'TRANSFER'
+            ? 'SUDAH_BAYAR'
+            : 'BELUM_BAYAR';
+
         $pesanan = Pesanan::create([
             'kode_resi' => $kodeResi,
             'id_customer' => null,
@@ -136,7 +140,7 @@ class CustomerController extends Controller
             'berat' => $request->berat,
             'total_harga' => $totalHarga,
             'metode_pembayaran' => $request->metode_pembayaran,
-            'status_pembayaran' => 'BELUM_BAYAR',
+            'status_pembayaran' => $statusPembayaran,
             'status_pesanan' => 'MENUNGGU_KURIR',
             'kecamatan_asal' => $request->kecamatan_asal,
             'kecamatan_tujuan' => $request->kecamatan_tujuan,

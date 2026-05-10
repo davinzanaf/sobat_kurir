@@ -80,18 +80,24 @@ class KurirController extends Controller
         $idKurir = session('id_user');
 
         $pesanan = Pesanan::where('id_kurir', $idKurir)
-            ->where('id_pesanan', $id)
-            ->firstOrFail();
+    ->where('id_pesanan', $id)
+    ->firstOrFail();
 
-        $pesanan->update([
-            'status_pesanan' => $request->status_pesanan,
-        ]);
+$dataUpdate = [
+    'status_pesanan' => $request->status_pesanan,
+];
 
-        $keterangan = match ($request->status_pesanan) {
-            'DIJEMPUT' => 'Paket sudah dijemput oleh kurir.',
-            'DALAM_PENGIRIMAN' => 'Paket sedang dalam perjalanan menuju alamat penerima.',
-            'SELESAI' => 'Paket sudah selesai diantar ke penerima.',
-        };
+if ($request->status_pesanan === 'SELESAI' && $pesanan->metode_pembayaran === 'COD') {
+    $dataUpdate['status_pembayaran'] = 'SUDAH_BAYAR';
+}
+
+$pesanan->update($dataUpdate);
+
+$keterangan = match ($request->status_pesanan) {
+    'DIJEMPUT' => 'Paket sudah dijemput oleh kurir.',
+    'DALAM_PENGIRIMAN' => 'Paket sedang dalam perjalanan menuju alamat penerima.',
+    'SELESAI' => 'Paket sudah selesai diantar ke penerima.',
+};
 
         Tracking::create([
             'id_pesanan' => $pesanan->id_pesanan,

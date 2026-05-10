@@ -75,15 +75,14 @@
             <input type="number" name="berat" min="1" value="{{ old('berat') }}" required>
         </div>
 
-        <div class="form-group">
-            <label>Metode Pembayaran</label>
-            <select name="metode_pembayaran" required>
-                <option value="">Pilih metode pembayaran</option>
-                <option value="COD" {{ old('metode_pembayaran') == 'COD' ? 'selected' : '' }}>COD</option>
-                <option value="TRANSFER" {{ old('metode_pembayaran') == 'TRANSFER' ? 'selected' : '' }}>Transfer</option>
-            </select>
-        </div>
-
+<div class="form-group">
+    <label>Metode Pembayaran</label>
+    <select name="metode_pembayaran" required>
+        <option value="">Pilih metode pembayaran</option>
+        <option value="TRANSFER" {{ old('metode_pembayaran') == 'TRANSFER' ? 'selected' : '' }}>Transfer</option>
+        <option value="COD" {{ old('metode_pembayaran') == 'COD' ? 'selected' : '' }}>COD</option>
+    </select>
+</div>
         <button class="btn" type="submit">Buat Pesanan</button>
         <a class="btn btn-secondary" href="{{ route('customer.dashboard') }}">Kembali</a>
     </form>
