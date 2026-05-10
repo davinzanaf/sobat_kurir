@@ -10,8 +10,23 @@
     </p>
 
     <div class="menu">
-        <a class="btn" href="#">Lihat Tugas Baru</a>
-        <a class="btn" href="#">Pesanan Saya</a>
+        <a class="btn" href="{{ route('kurir.tugas-baru') }}">Lihat Tugas Baru</a>
+        <a class="btn" href="{{ route('kurir.pesanan-saya') }}">Pesanan Saya</a>
     </div>
+</div>
+
+<div class="card">
+    <h3>Ringkasan Tugas</h3>
+
+    <table>
+        <tr>
+            <th>Tugas Baru</th>
+            <td>{{ $jumlahTugasBaru ?? 0 }}</td>
+        </tr>
+        <tr>
+            <th>Pesanan Saya</th>
+            <td>{{ $jumlahPesananSaya ?? 0 }}</td>
+        </tr>
+    </table>
 </div>
 @endsection
