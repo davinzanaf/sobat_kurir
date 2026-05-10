@@ -16,5 +16,6 @@ class Tarif extends Model
         'kecamatan_asal',
         'kecamatan_tujuan',
         'harga_per_kg',
+        'created_at',
     ];
 }

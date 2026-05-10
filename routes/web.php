@@ -26,8 +26,14 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/kurir', [AdminController::class, 'kurir'])->name('kurir.index');
     Route::get('/kurir/tambah', [AdminController::class, 'kurirCreate'])->name('kurir.create');
     Route::post('/kurir', [AdminController::class, 'kurirStore'])->name('kurir.store');
+    Route::delete('/kurir/{id}', [AdminController::class, 'kurirDestroy'])->name('kurir.destroy');
+    Route::get('/kurir-riwayat-hapus', [AdminController::class, 'riwayatHapusKurir'])->name('kurir.riwayat-hapus');
 
     Route::get('/tarif', [AdminController::class, 'tarif'])->name('tarif.index');
+    Route::get('/tarif/tambah', [AdminController::class, 'tarifCreate'])->name('tarif.create');
+    Route::post('/tarif', [AdminController::class, 'tarifStore'])->name('tarif.store');
+    Route::delete('/tarif/{id}', [AdminController::class, 'tarifDestroy'])->name('tarif.destroy');
+
     Route::get('/pesanan', [AdminController::class, 'pesanan'])->name('pesanan.index');
 });
 
