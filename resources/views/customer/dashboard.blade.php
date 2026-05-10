@@ -8,8 +8,8 @@
     <p class="muted">Silakan pilih layanan yang ingin digunakan.</p>
 
     <div class="menu">
-        <a class="btn" href="#">Cek Ongkir</a>
-        <a class="btn" href="#">Buat Pesanan</a>
+        <a class="btn" href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
+        <a class="btn" href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
         <a class="btn" href="{{ route('customer.tracking') }}">Cek Tracking</a>
     </div>
 </div>

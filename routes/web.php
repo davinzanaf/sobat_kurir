@@ -20,6 +20,17 @@ Route::post('/kurir/login', [AuthController::class, 'kurirLogin'])->name('kurir.
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/customer', [HomeController::class, 'customer'])->name('customer.dashboard');
+
+Route::get('/customer/cek-ongkir', [CustomerController::class, 'cekOngkir'])->name('customer.cek-ongkir');
+Route::post('/customer/cek-ongkir', [CustomerController::class, 'prosesCekOngkir'])->name('customer.cek-ongkir.process');
+
+Route::get('/customer/pesanan/buat', [CustomerController::class, 'buatPesanan'])->name('customer.pesanan.create');
+Route::post('/customer/pesanan', [CustomerController::class, 'simpanPesanan'])->name('customer.pesanan.store');
+
+Route::get('/customer/tracking', [CustomerController::class, 'tracking'])->name('customer.tracking');
+Route::post('/customer/tracking', [CustomerController::class, 'cariTracking'])->name('customer.tracking.search');
+
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 

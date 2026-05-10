@@ -15,6 +15,7 @@ class Tracking extends Model
     protected $fillable = [
         'id_pesanan',
         'keterangan',
+        'waktu_update',
     ];
 
     protected $casts = [

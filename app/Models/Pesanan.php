@@ -29,6 +29,7 @@ class Pesanan extends Model
         'status_pesanan',
         'kecamatan_asal',
         'kecamatan_tujuan',
+        'created_at',
     ];
 
     public function kurir()
