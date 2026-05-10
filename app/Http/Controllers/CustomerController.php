@@ -51,15 +51,13 @@ class CustomerController extends Controller
             ->orderBy('kecamatan_tujuan')
             ->pluck('kecamatan_tujuan');
 
-        if (!$tarif) {
-            return view('customer.cek-ongkir', [
-                'kecamatanAsal' => $kecamatanAsal,
-                'kecamatanTujuan' => $kecamatanTujuan,
-                'hasil' => null,
-            ])->withErrors([
+    if (!$tarif) {
+        return back()
+            ->withErrors([
                 'tarif' => 'Tarif untuk kecamatan asal dan tujuan tersebut belum tersedia.',
-            ]);
-        }
+            ])
+        ->withInput();
+    }
 
         $totalHarga = $tarif->harga_per_kg * $request->berat;
 
