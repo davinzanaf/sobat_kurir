@@ -18,6 +18,7 @@ class Pengguna extends Model
         'password',
         'no_hp',
         'role',
+        'created_at',
     ];
 
     protected $hidden = [

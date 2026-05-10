@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
@@ -20,7 +21,14 @@ Route::post('/kurir/login', [AuthController::class, 'kurirLogin'])->name('kurir.
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
-    Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/kurir', [AdminController::class, 'kurir'])->name('kurir.index');
+    Route::get('/kurir/tambah', [AdminController::class, 'kurirCreate'])->name('kurir.create');
+    Route::post('/kurir', [AdminController::class, 'kurirStore'])->name('kurir.store');
+
+    Route::get('/tarif', [AdminController::class, 'tarif'])->name('tarif.index');
+    Route::get('/pesanan', [AdminController::class, 'pesanan'])->name('pesanan.index');
 });
 
 Route::middleware('kurir')->prefix('kurir')->name('kurir.')->group(function () {
