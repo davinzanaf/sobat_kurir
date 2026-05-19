@@ -14,19 +14,20 @@
 </div>
 
 <div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kecamatan Asal</th>
-                <th>Kecamatan Tujuan</th>
-                <th>Harga per Kg</th>
-                <th>Tanggal Dibuat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($tarif as $item)
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kecamatan Asal</th>
+                    <th>Kecamatan Tujuan</th>
+                    <th>Harga per Kg</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($tarif as $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->kecamatan_asal }}</td>
@@ -42,12 +43,13 @@
                         </form>
                     </td>
                 </tr>
-            @empty
+                @empty
                 <tr>
                     <td colspan="6">Belum ada data tarif.</td>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

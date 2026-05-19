@@ -15,19 +15,20 @@
 </div>
 
 <div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama Kurir</th>
-                <th>Email</th>
-                <th>No HP</th>
-                <th>Tanggal Dibuat</th>
-                <th>Aksi Hapus</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($kurir as $item)
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Kurir</th>
+                    <th>Email</th>
+                    <th>No HP</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi Hapus</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($kurir as $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->nama_lengkap }}</td>
@@ -58,12 +59,13 @@
                         </form>
                     </td>
                 </tr>
-            @empty
+                @empty
                 <tr>
                     <td colspan="6">Belum ada data kurir.</td>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

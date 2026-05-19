@@ -13,21 +13,22 @@
 </div>
 
 <div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kode Resi</th>
-                <th>Pengirim</th>
-                <th>Penerima</th>
-                <th>Rute</th>
-                <th>Total Harga</th>
-                <th>Status Saat Ini</th>
-                <th>Update Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($pesanan as $item)
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kode Resi</th>
+                    <th>Pengirim</th>
+                    <th>Penerima</th>
+                    <th>Rute</th>
+                    <th>Total Harga</th>
+                    <th>Status Saat Ini</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($pesanan as $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->kode_resi }}</td>
@@ -52,32 +53,33 @@
                     </td>
                     <td>
                         @if($item->status_pesanan !== 'SELESAI')
-                            <form method="POST" action="{{ route('kurir.update-status', $item->id_pesanan) }}">
-                                @csrf
-                                @method('PATCH')
+                        <form method="POST" action="{{ route('kurir.update-status', $item->id_pesanan) }}">
+                            @csrf
+                            @method('PATCH')
 
-                                <div class="form-group">
-                                    <select name="status_pesanan" required>
-                                        <option value="">Pilih status</option>
-                                        <option value="DIJEMPUT" {{ $item->status_pesanan == 'DIJEMPUT' ? 'selected' : '' }}>DIJEMPUT</option>
-                                        <option value="DALAM_PENGIRIMAN" {{ $item->status_pesanan == 'DALAM_PENGIRIMAN' ? 'selected' : '' }}>DALAM PENGIRIMAN</option>
-                                        <option value="SELESAI" {{ $item->status_pesanan == 'SELESAI' ? 'selected' : '' }}>SELESAI</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <select name="status_pesanan" required>
+                                    <option value="">Pilih status</option>
+                                    <option value="DIJEMPUT" {{ $item->status_pesanan == 'DIJEMPUT' ? 'selected' : '' }}>DIJEMPUT</option>
+                                    <option value="DALAM_PENGIRIMAN" {{ $item->status_pesanan == 'DALAM_PENGIRIMAN' ? 'selected' : '' }}>DALAM PENGIRIMAN</option>
+                                    <option value="SELESAI" {{ $item->status_pesanan == 'SELESAI' ? 'selected' : '' }}>SELESAI</option>
+                                </select>
+                            </div>
 
-                                <button class="btn" type="submit">Update</button>
-                            </form>
+                            <button class="btn" type="submit">Update</button>
+                        </form>
                         @else
-                            <span class="badge">SELESAI</span>
+                        <span class="badge">SELESAI</span>
                         @endif
                     </td>
                 </tr>
-            @empty
+                @empty
                 <tr>
                     <td colspan="8">Belum ada pesanan yang kamu ambil.</td>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

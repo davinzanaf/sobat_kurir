@@ -10,6 +10,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -17,18 +21,27 @@
             color: #1f2937;
         }
 
+        a {
+            color: inherit;
+        }
+
         .navbar {
             background: #2563eb;
             color: white;
             padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
         }
 
         .navbar-inner {
-            max-width: 1100px;
+            max-width: 1180px;
             margin: auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
         }
 
         .brand {
@@ -36,22 +49,37 @@
             font-size: 20px;
             color: white;
             text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .nav-links a,
         .nav-links button {
             color: white;
             text-decoration: none;
-            margin-left: 14px;
-            background: none;
-            border: none;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
             font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links button:hover {
+            background: rgba(255, 255, 255, 0.22);
         }
 
         .container {
-            width: 92%;
-            max-width: 1100px;
+            width: min(92%, 1180px);
             margin: 32px auto;
         }
 
@@ -71,9 +99,10 @@
         }
 
         .hero h1 {
-            font-size: 38px;
+            font-size: clamp(30px, 4vw, 44px);
             margin: 0 0 12px;
             color: #111827;
+            line-height: 1.15;
         }
 
         .hero p {
@@ -89,7 +118,9 @@
         }
 
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             background: #2563eb;
             color: white;
             padding: 11px 16px;
@@ -98,6 +129,8 @@
             border: none;
             cursor: pointer;
             font-size: 14px;
+            min-height: 42px;
+            transition: 0.2s;
         }
 
         .btn-secondary {
@@ -110,6 +143,7 @@
 
         .btn:hover {
             opacity: 0.92;
+            transform: translateY(-1px);
         }
 
         .form-group {
@@ -130,14 +164,34 @@
             border: 1px solid #d1d5db;
             border-radius: 10px;
             font-size: 14px;
+            background: white;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
+            min-width: 720px;
             border-collapse: collapse;
             background: white;
-            overflow: hidden;
             border-radius: 12px;
+            overflow: hidden;
         }
 
         th,
@@ -150,6 +204,7 @@
 
         th {
             background: #eff6ff;
+            white-space: nowrap;
         }
 
         .alert-error {
@@ -176,33 +231,121 @@
             color: #0369a1;
             font-size: 12px;
             font-weight: bold;
+            white-space: nowrap;
         }
 
         .muted {
             color: #6b7280;
         }
 
-        @media (max-width: 768px) {
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 992px) {
             .hero {
                 grid-template-columns: 1fr;
             }
 
-            .hero h1 {
-                font-size: 30px;
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .navbar-inner {
-                display: block;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 14px 16px;
+            }
+
+            .navbar-inner {
+                flex-direction: column;
             }
 
             .nav-links {
-                margin-top: 12px;
+                width: 100%;
+                justify-content: flex-start;
             }
 
             .nav-links a,
             .nav-links button {
-                margin-left: 0;
-                margin-right: 10px;
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 22px auto;
+            }
+
+            .card {
+                padding: 18px;
+                border-radius: 14px;
+            }
+
+            .grid-3,
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .menu {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            table {
+                min-width: 680px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand {
+                font-size: 18px;
+            }
+
+            .nav-links {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .nav-links a,
+            .nav-links button {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                width: 95%;
+                margin: 18px auto;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 16px;
+            }
+
+            table {
+                min-width: 640px;
             }
         }
     </style>
@@ -213,10 +356,27 @@
             <a class="brand" href="{{ route('home') }}">Sobat Kurir</a>
 
             <div class="nav-links">
-                <a href="{{ route('customer.dashboard') }}">Customer</a>
-                <a href="{{ route('customer.tracking') }}">Tracking</a>
-                <a href="{{ route('admin.login') }}">Admin</a>
-                <a href="{{ route('kurir.login') }}">Kurir</a>
+                @if(session('role') === 'admin')
+                    <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                    <a href="{{ route('admin.kurir.index') }}">Kurir</a>
+                    <a href="{{ route('admin.tarif.index') }}">Tarif</a>
+                    <a href="{{ route('admin.pesanan.index') }}">Pesanan</a>
+                @elseif(session('role') === 'kurir')
+                    <a href="{{ route('kurir.dashboard') }}">Dashboard</a>
+                    <a href="{{ route('kurir.tugas-baru') }}">Tugas Baru</a>
+                    <a href="{{ route('kurir.pesanan-saya') }}">Pesanan Saya</a>
+                @elseif(session('role') === 'customer')
+                    <a href="{{ route('customer.dashboard') }}">Dashboard</a>
+                    <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
+                    <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
+                    <a href="{{ route('customer.tracking') }}">Tracking</a>
+                @else
+                    <a href="{{ route('home') }}">Beranda</a>
+                    <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
+                    <a href="{{ route('customer.tracking') }}">Tracking</a>
+                    <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
+                    <a href="{{ route('admin.login') }}">Login</a>
+                @endif
 
                 @if(session()->has('role'))
                     <form method="POST" action="{{ route('logout') }}" style="display:inline;">

@@ -11,21 +11,22 @@
 </div>
 
 <div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kode Resi</th>
-                <th>Pengirim</th>
-                <th>Penerima</th>
-                <th>Berat</th>
-                <th>Total Harga</th>
-                <th>Kurir</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($pesanan as $item)
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kode Resi</th>
+                    <th>Pengirim</th>
+                    <th>Penerima</th>
+                    <th>Berat</th>
+                    <th>Total Harga</th>
+                    <th>Kurir</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($pesanan as $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->kode_resi }}</td>
@@ -44,12 +45,13 @@
                         <span class="badge">{{ $item->status_pesanan }}</span>
                     </td>
                 </tr>
-            @empty
+                @empty
                 <tr>
                     <td colspan="8">Belum ada data pesanan.</td>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection
