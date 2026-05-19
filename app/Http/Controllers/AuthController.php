@@ -23,6 +23,68 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function showRegisterCustomer()
+    {
+        return view('auth.register-customer');
+    }
+
+    public function registerCustomer(Request $request)
+    {
+        $request->validate([
+            'nama_lengkap' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:100', 'unique:tabel_users,email'],
+            'no_hp' => ['required', 'string', 'max:20'],
+            'alamat' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:4', 'confirmed'],
+        ]);
+
+        Pengguna::create([
+            'nama_lengkap' => $request->nama_lengkap,
+            'email' => $request->email,
+            'no_hp' => $request->no_hp,
+            'alamat' => $request->alamat,
+            'password' => Hash::make($request->password),
+            'role' => 'customer',
+            'status_akun' => 'AKTIF',
+            'created_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('login')
+            ->with('success', 'Akun customer berhasil dibuat. Silakan login.');
+    }
+
+    public function showDaftarKurir()
+    {
+        return view('auth.daftar-kurir');
+    }
+
+    public function daftarKurir(Request $request)
+    {
+        $request->validate([
+            'nama_lengkap' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:100', 'unique:tabel_users,email'],
+            'no_hp' => ['required', 'string', 'max:20'],
+            'alamat' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:4', 'confirmed'],
+        ]);
+
+        Pengguna::create([
+            'nama_lengkap' => $request->nama_lengkap,
+            'email' => $request->email,
+            'no_hp' => $request->no_hp,
+            'alamat' => $request->alamat,
+            'password' => Hash::make($request->password),
+            'role' => 'kurir',
+            'status_akun' => 'MENUNGGU',
+            'created_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('login')
+            ->with('success', 'Pendaftaran kurir berhasil dikirim. Silakan tunggu persetujuan admin.');
+    }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -38,11 +100,16 @@ class AuthController extends Controller
                 ->withInput();
         }
 
-        $statusAkun = $user->status_akun ?? 'AKTIF';
+        if ($user->status_akun !== 'AKTIF') {
+            $pesan = match ($user->status_akun) {
+                'MENUNGGU' => 'Akun Anda masih menunggu persetujuan admin.',
+                'DITOLAK' => 'Pendaftaran akun Anda ditolak. Alasan: ' . ($user->alasan_ditolak ?? '-'),
+                'NONAKTIF' => 'Akun Anda sedang dinonaktifkan.',
+                default => 'Akun Anda belum bisa digunakan.',
+            };
 
-        if ($statusAkun !== 'AKTIF') {
             return back()
-                ->withErrors(['email' => 'Akun belum aktif atau masih menunggu persetujuan admin.'])
+                ->withErrors(['email' => $pesan])
                 ->withInput();
         }
 

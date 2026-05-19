@@ -17,13 +17,23 @@ class Pengguna extends Model
         'email',
         'password',
         'no_hp',
+        'alamat',
         'role',
+        'status_akun',
+        'alasan_ditolak',
+        'approved_at',
+        'approved_by',
         'created_at',
     ];
 
     protected $hidden = [
         'password',
     ];
+
+    public function pesananCustomer()
+    {
+        return $this->hasMany(Pesanan::class, 'id_customer', 'id_user');
+    }
 
     public function pesananKurir()
     {

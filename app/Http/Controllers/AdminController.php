@@ -14,12 +14,21 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $jumlahKurir = Pengguna::where('role', 'kurir')->count();
+        $jumlahKurir = Pengguna::where('role', 'kurir')
+            ->where('status_akun', 'AKTIF')
+            ->count();
+
+        $jumlahPendaftarKurir = Pengguna::where('role', 'kurir')
+            ->where('status_akun', 'MENUNGGU')
+            ->count();
+
         $jumlahTarif = Tarif::count();
+
         $jumlahPesanan = Pesanan::count();
 
         return view('admin.dashboard', compact(
             'jumlahKurir',
+            'jumlahPendaftarKurir',
             'jumlahTarif',
             'jumlahPesanan'
         ));
@@ -28,6 +37,7 @@ class AdminController extends Controller
     public function kurir()
     {
         $kurir = Pengguna::where('role', 'kurir')
+            ->where('status_akun', 'AKTIF')
             ->orderBy('id_user', 'desc')
             ->get();
 
@@ -54,6 +64,7 @@ class AdminController extends Controller
             'no_hp' => $request->no_hp,
             'password' => Hash::make($request->password),
             'role' => 'kurir',
+            'status_akun' => 'AKTIF',
             'created_at' => now(),
         ]);
 
@@ -62,45 +73,97 @@ class AdminController extends Controller
             ->with('success', 'Kurir berhasil ditambahkan.');
     }
 
-    public function kurirDestroy(Request $request, $id)
-{
-    $request->validate([
-        'alasan_hapus' => ['required', 'string', 'max:150'],
-        'catatan_hapus' => ['nullable', 'string', 'max:255'],
-    ]);
+    public function pendaftarKurir()
+    {
+        $pendaftar = Pengguna::where('role', 'kurir')
+            ->where('status_akun', 'MENUNGGU')
+            ->orderBy('id_user', 'desc')
+            ->get();
 
-    $kurir = Pengguna::where('role', 'kurir')
-        ->where('id_user', $id)
-        ->firstOrFail();
-
-    $alasan = $request->alasan_hapus;
-
-    if ($request->filled('catatan_hapus')) {
-        $alasan .= ' - ' . $request->catatan_hapus;
+        return view('admin.kurir.pendaftar', compact('pendaftar'));
     }
 
-    DB::transaction(function () use ($kurir, $alasan) {
-        RiwayatHapusKurir::create([
-            'id_user_lama' => $kurir->id_user,
-            'nama_lengkap' => $kurir->nama_lengkap,
-            'email' => $kurir->email,
-            'no_hp' => $kurir->no_hp,
-            'alasan_hapus' => $alasan,
-            'dihapus_oleh_id' => session('id_user'),
-            'dihapus_oleh_nama' => session('nama_lengkap'),
+    public function approveKurir($id)
+    {
+        $kurir = Pengguna::where('role', 'kurir')
+            ->where('status_akun', 'MENUNGGU')
+            ->where('id_user', $id)
+            ->firstOrFail();
+
+        $kurir->update([
+            'status_akun' => 'AKTIF',
+            'approved_at' => now(),
+            'approved_by' => session('id_user'),
+            'alasan_ditolak' => null,
         ]);
 
-        Pesanan::where('id_kurir', $kurir->id_user)->update([
-            'id_kurir' => null,
+        return redirect()
+            ->route('admin.kurir.pendaftar')
+            ->with('success', 'Pendaftar kurir berhasil disetujui.');
+    }
+
+    public function rejectKurir(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_ditolak' => ['required', 'string', 'max:255'],
         ]);
 
-        $kurir->delete();
-    });
+        $kurir = Pengguna::where('role', 'kurir')
+            ->where('status_akun', 'MENUNGGU')
+            ->where('id_user', $id)
+            ->firstOrFail();
 
-    return redirect()
-        ->route('admin.kurir.index')
-        ->with('success', 'Kurir berhasil dihapus dan masuk ke riwayat hapus.');
-}
+        $kurir->update([
+            'status_akun' => 'DITOLAK',
+            'alasan_ditolak' => $request->alasan_ditolak,
+            'approved_at' => null,
+            'approved_by' => session('id_user'),
+        ]);
+
+        return redirect()
+            ->route('admin.kurir.pendaftar')
+            ->with('success', 'Pendaftar kurir berhasil ditolak.');
+    }
+
+    public function kurirDestroy(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_hapus' => ['required', 'string', 'max:150'],
+            'catatan_hapus' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $kurir = Pengguna::where('role', 'kurir')
+            ->where('id_user', $id)
+            ->firstOrFail();
+
+        $alasan = $request->alasan_hapus;
+
+        if ($request->filled('catatan_hapus')) {
+            $alasan .= ' - ' . $request->catatan_hapus;
+        }
+
+        DB::transaction(function () use ($kurir, $alasan) {
+            RiwayatHapusKurir::create([
+                'id_user_lama' => $kurir->id_user,
+                'nama_lengkap' => $kurir->nama_lengkap,
+                'email' => $kurir->email,
+                'no_hp' => $kurir->no_hp,
+                'alasan_hapus' => $alasan,
+                'dihapus_oleh_id' => session('id_user'),
+                'dihapus_oleh_nama' => session('nama_lengkap'),
+            ]);
+
+            Pesanan::where('id_kurir', $kurir->id_user)->update([
+                'id_kurir' => null,
+            ]);
+
+            $kurir->delete();
+        });
+
+        return redirect()
+            ->route('admin.kurir.index')
+            ->with('success', 'Kurir berhasil dihapus dan masuk ke riwayat hapus.');
+    }
 
     public function riwayatHapusKurir()
     {

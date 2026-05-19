@@ -10,6 +10,22 @@ use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
+    public function dashboard()
+{
+    $jumlahPesanan = Pesanan::where('id_customer', session('id_user'))->count();
+
+    return view('customer.dashboard', compact('jumlahPesanan'));
+}
+
+public function riwayatPesanan()
+{
+    $pesanan = Pesanan::with('kurir')
+        ->where('id_customer', session('id_user'))
+        ->orderBy('id_pesanan', 'desc')
+        ->get();
+
+    return view('customer.riwayat-pesanan', compact('pesanan'));
+}
     public function cekOngkir()
     {
         $kecamatanAsal = Tarif::select('kecamatan_asal')
@@ -129,7 +145,7 @@ class CustomerController extends Controller
 
         $pesanan = Pesanan::create([
             'kode_resi' => $kodeResi,
-            'id_customer' => null,
+            'id_customer' => session('id_user'),
             'id_kurir' => null,
             'nama_pengirim' => $request->nama_pengirim,
             'no_hp_pengirim' => $request->no_hp_pengirim,

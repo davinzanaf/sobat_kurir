@@ -361,6 +361,7 @@
         <a href="{{ route('admin.kurir.index') }}">Kurir</a>
         <a href="{{ route('admin.tarif.index') }}">Tarif</a>
         <a href="{{ route('admin.pesanan.index') }}">Pesanan</a>
+        <a href="{{ route('admin.kurir.pendaftar') }}">Pendaftar Kurir</a>
     @elseif(session('role') === 'kurir')
         <a href="{{ route('kurir.dashboard') }}">Dashboard</a>
         <a href="{{ route('kurir.tugas-baru') }}">Tugas Baru</a>
@@ -370,11 +371,14 @@
         <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
         <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
         <a href="{{ route('customer.tracking') }}">Tracking</a>
+        <a href="{{ route('customer.riwayat-pesanan') }}">Riwayat</a>
     @else
         <a href="{{ route('home') }}">Beranda</a>
         <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
         <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
         <a href="{{ route('customer.tracking') }}">Tracking</a>
+        <a href="{{ route('register.customer') }}">Daftar Customer</a>
+        <a href="{{ route('register.kurir') }}">Daftar Kurir</a>
         <a href="{{ route('login') }}">Login</a>
     @endif
 

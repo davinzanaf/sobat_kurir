@@ -13,6 +13,7 @@
         <a class="btn" href="{{ route('admin.kurir.index') }}">Kelola Kurir</a>
         <a class="btn" href="{{ route('admin.tarif.index') }}">Kelola Tarif</a>
         <a class="btn" href="{{ route('admin.pesanan.index') }}">Data Pesanan</a>
+        <a class="btn" href="{{ route('admin.kurir.pendaftar') }}">Pendaftar Kurir</a>
     </div>
 </div>
 
@@ -31,6 +32,10 @@
         <tr>
             <th>Total Pesanan</th>
             <td>{{ $jumlahPesanan }}</td>
+        </tr>
+        <tr>
+            <th>Pendaftar Kurir Menunggu</th>
+            <td>{{ $jumlahPendaftarKurir ?? 0 }}</td>
         </tr>
     </table>
 </div>
