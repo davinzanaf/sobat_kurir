@@ -2,410 +2,187 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Sobat Kurir')</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
-            color: #1f2937;
+            font-family: 'Inter', sans-serif;
         }
 
-        a {
-            color: inherit;
-        }
-
-        .navbar {
-            background: #2563eb;
-            color: white;
-            padding: 16px 24px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
-        }
-
-        .navbar-inner {
-            max-width: 1180px;
-            margin: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .brand {
-            font-weight: bold;
-            font-size: 20px;
-            color: white;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .nav-links a,
-        .nav-links button {
-            color: white;
-            text-decoration: none;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            font-size: 14px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            transition: 0.2s;
-        }
-
-        .nav-links a:hover,
-        .nav-links button:hover {
-            background: rgba(255, 255, 255, 0.22);
-        }
-
-        .container {
-            width: min(92%, 1180px);
-            margin: 32px auto;
-        }
-
-        .card {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-            margin-bottom: 20px;
-        }
-
-        .hero {
-            display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            gap: 24px;
-            align-items: center;
-        }
-
-        .hero h1 {
-            font-size: clamp(30px, 4vw, 44px);
-            margin: 0 0 12px;
-            color: #111827;
-            line-height: 1.15;
-        }
-
-        .hero p {
-            color: #4b5563;
-            line-height: 1.7;
-        }
-
-        .menu {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            background: #2563eb;
-            color: white;
-            padding: 11px 16px;
-            border-radius: 10px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            min-height: 42px;
-            transition: 0.2s;
-        }
-
-        .btn-secondary {
-            background: #111827;
-        }
-
-        .btn-danger {
-            background: #dc2626;
-        }
-
-        .btn:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            font-size: 14px;
-            background: white;
-        }
-
-        textarea {
-            resize: vertical;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
-            width: 100%;
-            min-width: 720px;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e5e7eb;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background: #eff6ff;
-            white-space: nowrap;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 16px;
-        }
-
-        .alert-success {
-            background: #dcfce7;
-            color: #166534;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 16px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 999px;
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 12px;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        .muted {
-            color: #6b7280;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        @media (max-width: 992px) {
-            .hero {
-                grid-template-columns: 1fr;
-            }
-
-            .grid-3 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .navbar-inner {
-                align-items: flex-start;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 14px 16px;
-            }
-
-            .navbar-inner {
-                flex-direction: column;
-            }
-
-            .nav-links {
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .nav-links a,
-            .nav-links button {
-                font-size: 13px;
-                padding: 8px 10px;
-            }
-
-            .container {
-                width: 94%;
-                margin: 22px auto;
-            }
-
-            .card {
-                padding: 18px;
-                border-radius: 14px;
-            }
-
-            .grid-3,
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-
-            .menu {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
-            table {
-                min-width: 680px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .brand {
-                font-size: 18px;
-            }
-
-            .nav-links {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-
-            .nav-links a,
-            .nav-links button {
-                width: 100%;
-                text-align: center;
-            }
-
-            .container {
-                width: 95%;
-                margin: 18px auto;
-            }
-
-            .card {
-                padding: 16px;
-            }
-
-            input,
-            select,
-            textarea {
-                font-size: 16px;
-            }
-
-            table {
-                min-width: 640px;
-            }
+        .subtle-grid {
+            background-image:
+                linear-gradient(to right, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+            background-size: 32px 32px;
         }
     </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="navbar-inner">
-            <a class="brand" href="{{ route('home') }}">Sobat Kurir</a>
 
-            <div class="nav-links">
-    @if(session('role') === 'admin')
-        <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-        <a href="{{ route('admin.kurir.index') }}">Kurir</a>
-        <a href="{{ route('admin.tarif.index') }}">Tarif</a>
-        <a href="{{ route('admin.pesanan.index') }}">Pesanan</a>
-        <a href="{{ route('admin.kurir.pendaftar') }}">Pendaftar Kurir</a>
-    @elseif(session('role') === 'kurir')
-        <a href="{{ route('kurir.dashboard') }}">Dashboard</a>
-        <a href="{{ route('kurir.tugas-baru') }}">Tugas Baru</a>
-        <a href="{{ route('kurir.pesanan-saya') }}">Pesanan Saya</a>
-    @elseif(session('role') === 'customer')
-        <a href="{{ route('customer.dashboard') }}">Dashboard</a>
-        <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
-        <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
-        <a href="{{ route('customer.tracking') }}">Tracking</a>
-        <a href="{{ route('customer.riwayat-pesanan') }}">Riwayat</a>
-    @else
-        <a href="{{ route('home') }}">Beranda</a>
-        <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
-        <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
-        <a href="{{ route('customer.tracking') }}">Tracking</a>
-        <a href="{{ route('register.customer') }}">Daftar Customer</a>
-        <a href="{{ route('register.kurir') }}">Daftar Kurir</a>
-        <a href="{{ route('login') }}">Login</a>
-    @endif
+<body class="bg-slate-50 text-slate-900 antialiased">
+    @php
+        $role = session('role');
+        $namaUser = session('nama_lengkap', 'User');
 
-    @if(session()->has('role'))
-        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-            @csrf
-            <button type="submit">Logout</button>
-        </form>
-    @endif
-</div>
-        </div>
-    </nav>
+        $dashboardUrl = match ($role) {
+            'admin' => route('admin.dashboard'),
+            'kurir' => route('kurir.dashboard'),
+            'customer' => route('customer.dashboard'),
+            default => url('/'),
+        };
+    @endphp
 
-    <main class="container">
-        @if($errors->any())
-            <div class="alert-error">
-                {{ $errors->first() }}
+    <div class="min-h-screen flex flex-col">
+        <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+            <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
+                <a href="{{ url('/') }}" class="flex items-center gap-3 shrink-0">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0h7.5m-10.5 0H3.75a.75.75 0 01-.75-.75V6.75A.75.75 0 013.75 6h10.5a.75.75 0 01.75.75v12m0 0h.75m0 0a1.5 1.5 0 003 0m-3 0a1.5 1.5 0 013 0m0 0h1.5a.75.75 0 00.75-.75v-5.25a.75.75 0 00-.22-.53l-2.25-2.25a.75.75 0 00-.53-.22H15" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="block text-lg font-extrabold tracking-tight text-slate-950">
+                            Sobat Kurir
+                        </span>
+                        <span class="hidden text-xs font-medium text-slate-500 sm:block">
+                            Local Delivery Service
+                        </span>
+                    </div>
+                </a>
+
+                @if(!$role)
+                    <div class="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
+                        <a href="{{ url('/') }}" class="transition hover:text-blue-600">Beranda</a>
+                        <a href="{{ route('customer.cek-ongkir') }}" class="transition hover:text-blue-600">Cek Ongkir</a>
+                        <a href="{{ route('customer.tracking') }}" class="transition hover:text-blue-600">Lacak Paket</a>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('register.kurir') }}" class="hidden text-sm font-bold text-slate-600 transition hover:text-blue-600 sm:inline-flex">
+                            Daftar Kurir
+                        </a>
+
+                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-extrabold text-white transition hover:bg-blue-700">
+                            Login
+                        </a>
+                    </div>
+                @else
+                    <div class="hidden items-center gap-7 text-sm font-semibold text-slate-600 lg:flex">
+                        <a href="{{ $dashboardUrl }}" class="transition hover:text-blue-600">Dashboard</a>
+
+                        @if($role === 'admin')
+                            <a href="{{ route('admin.kurir.index') }}" class="transition hover:text-blue-600">Kurir</a>
+                            <a href="{{ route('admin.kurir.pendaftar') }}" class="transition hover:text-blue-600">Pendaftar</a>
+                            <a href="{{ route('admin.tarif.index') }}" class="transition hover:text-blue-600">Tarif</a>
+                            <a href="{{ route('admin.pesanan.index') }}" class="transition hover:text-blue-600">Pesanan</a>
+                        @elseif($role === 'kurir')
+                            <a href="{{ route('kurir.tugas-baru') }}" class="transition hover:text-blue-600">Tugas Baru</a>
+                            <a href="{{ route('kurir.pesanan-saya') }}" class="transition hover:text-blue-600">Pesanan Saya</a>
+                        @elseif($role === 'customer')
+                            <a href="{{ route('customer.pesanan.create') }}" class="transition hover:text-blue-600">Buat Pesanan</a>
+                            <a href="{{ route('customer.riwayat-pesanan') }}" class="transition hover:text-blue-600">Riwayat</a>
+                            <a href="{{ route('customer.tracking') }}" class="transition hover:text-blue-600">Tracking</a>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="hidden text-right sm:block">
+                            <p class="max-w-[160px] truncate text-sm font-extrabold text-slate-950">
+                                {{ $namaUser }}
+                            </p>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                {{ $role }}
+                            </p>
+                        </div>
+
+                        <a href="{{ $dashboardUrl }}" class="hidden rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-600 md:inline-flex">
+                            Dashboard
+                        </a>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-extrabold text-white transition hover:bg-slate-800">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                @endif
+            </nav>
+
+            @if($role)
+                <div class="border-t border-slate-100 bg-white px-5 py-3 lg:hidden">
+                    <div class="mx-auto flex max-w-7xl gap-2 overflow-x-auto text-sm font-bold text-slate-600">
+                        <a href="{{ $dashboardUrl }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Dashboard</a>
+
+                        @if($role === 'admin')
+                            <a href="{{ route('admin.kurir.index') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Kurir</a>
+                            <a href="{{ route('admin.kurir.pendaftar') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Pendaftar</a>
+                            <a href="{{ route('admin.tarif.index') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Tarif</a>
+                            <a href="{{ route('admin.pesanan.index') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Pesanan</a>
+                        @elseif($role === 'kurir')
+                            <a href="{{ route('kurir.tugas-baru') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Tugas Baru</a>
+                            <a href="{{ route('kurir.pesanan-saya') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Pesanan Saya</a>
+                        @elseif($role === 'customer')
+                            <a href="{{ route('customer.pesanan.create') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Buat Pesanan</a>
+                            <a href="{{ route('customer.riwayat-pesanan') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Riwayat</a>
+                            <a href="{{ route('customer.tracking') }}" class="shrink-0 rounded-xl bg-slate-100 px-4 py-2">Tracking</a>
+                        @endif
+                    </div>
+                </div>
+            @endif
+        </header>
+
+        <main class="flex-1">
+            @if($errors->any())
+                <div class="mx-auto mt-6 max-w-7xl px-5 lg:px-8">
+                    <div class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
+                        {{ $errors->first() }}
+                    </div>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="mx-auto mt-6 max-w-7xl px-5 lg:px-8">
+                    <div class="rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm font-semibold text-green-700">
+                        {{ session('success') }}
+                    </div>
+                </div>
+            @endif
+
+            @yield('content')
+        </main>
+
+        <footer class="border-t border-slate-200 bg-white px-5 py-8 lg:px-8">
+            <div class="mx-auto flex max-w-7xl flex-col justify-between gap-4 text-sm text-slate-500 md:flex-row md:items-center">
+                <p>© {{ date('Y') }} Sobat Kurir. Semua hak dilindungi.</p>
+
+                <div class="flex flex-wrap gap-5">
+                    <a href="{{ route('customer.cek-ongkir') }}" class="hover:text-blue-600">Cek Ongkir</a>
+                    <a href="{{ route('customer.tracking') }}" class="hover:text-blue-600">Tracking</a>
+                    <a href="{{ route('register.kurir') }}" class="hover:text-blue-600">Daftar Kurir</a>
+                </div>
             </div>
-        @endif
-
-        @if(session('success'))
-            <div class="alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @yield('content')
-    </main>
+        </footer>
+    </div>
 </body>
 </html>
