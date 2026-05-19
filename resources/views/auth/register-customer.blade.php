@@ -3,72 +3,104 @@
 @section('title', 'Daftar Customer - Sobat Kurir')
 
 @section('content')
-<div class="card" style="max-width: 620px; margin: auto;">
-    <h2>Daftar Customer</h2>
-    <p class="muted">
-        Buat akun customer untuk membuat pesanan dan melihat riwayat pengiriman.
-    </p>
+<section class="bg-slate-50 px-5 py-12 lg:px-8">
+    <div class="mx-auto max-w-3xl">
+        <div class="mb-8">
+            <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
+                Daftar Customer
+            </p>
 
-    <form method="POST" action="{{ route('register.customer.process') }}">
-        @csrf
+            <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+                Buat akun customer
+            </h1>
 
-        <div class="form-group">
-            <label>Nama Lengkap</label>
-            <input
-                type="text"
-                name="nama_lengkap"
-                value="{{ old('nama_lengkap') }}"
-                required
-            >
+            <p class="mt-3 max-w-2xl leading-7 text-slate-600">
+                Gunakan akun customer untuk membuat pesanan dan melihat riwayat pengiriman Anda.
+            </p>
         </div>
 
-        <div class="form-group">
-            <label>Email</label>
-            <input
-                type="email"
-                name="email"
-                value="{{ old('email') }}"
-                required
-            >
-        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <form method="POST" action="{{ route('register.customer.process') }}" class="grid gap-5">
+                @csrf
 
-        <div class="form-group">
-            <label>No HP</label>
-            <input
-                type="text"
-                name="no_hp"
-                value="{{ old('no_hp') }}"
-                required
-            >
-        </div>
+                <div>
+                    <label class="mb-2 block text-sm font-bold text-slate-700">Nama Lengkap</label>
+                    <input
+                        type="text"
+                        name="nama_lengkap"
+                        value="{{ old('nama_lengkap') }}"
+                        class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        required
+                    >
+                </div>
 
-        <div class="form-group">
-            <label>Alamat</label>
-            <textarea name="alamat" rows="3" required>{{ old('alamat') }}</textarea>
-        </div>
+                <div class="grid gap-5 md:grid-cols-2">
+                    <div>
+                        <label class="mb-2 block text-sm font-bold text-slate-700">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                            required
+                        >
+                    </div>
 
-        <div class="form-group">
-            <label>Password</label>
-            <input
-                type="password"
-                name="password"
-                required
-            >
-        </div>
+                    <div>
+                        <label class="mb-2 block text-sm font-bold text-slate-700">No HP</label>
+                        <input
+                            type="text"
+                            name="no_hp"
+                            value="{{ old('no_hp') }}"
+                            class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                            required
+                        >
+                    </div>
+                </div>
 
-        <div class="form-group">
-            <label>Konfirmasi Password</label>
-            <input
-                type="password"
-                name="password_confirmation"
-                required
-            >
-        </div>
+                <div>
+                    <label class="mb-2 block text-sm font-bold text-slate-700">Alamat</label>
+                    <textarea
+                        name="alamat"
+                        rows="4"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        required
+                    >{{ old('alamat') }}</textarea>
+                </div>
 
-        <div class="menu">
-            <button class="btn" type="submit">Daftar Customer</button>
-            <a class="btn btn-secondary" href="{{ route('login') }}">Sudah punya akun?</a>
+                <div class="grid gap-5 md:grid-cols-2">
+                    <div>
+                        <label class="mb-2 block text-sm font-bold text-slate-700">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-sm font-bold text-slate-700">Konfirmasi Password</label>
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3 pt-2 sm:flex-row">
+                    <button type="submit" class="inline-flex h-12 items-center justify-center rounded-xl bg-blue-600 px-6 text-sm font-extrabold text-white transition hover:bg-blue-700">
+                        Daftar Customer
+                    </button>
+
+                    <a href="{{ route('login') }}" class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
+                        Sudah punya akun?
+                    </a>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
+    </div>
+</section>
 @endsection
