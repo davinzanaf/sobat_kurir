@@ -9,13 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/customer', [HomeController::class, 'customer'])->name('customer.dashboard');
-Route::get('/customer/cek-ongkir', [CustomerController::class, 'cekOngkir'])->name('customer.cek-ongkir');
-Route::post('/customer/cek-ongkir', [CustomerController::class, 'prosesCekOngkir'])->name('customer.cek-ongkir.process');
-Route::get('/customer/pesanan/buat', [CustomerController::class, 'buatPesanan'])->name('customer.pesanan.create');
-Route::post('/customer/pesanan', [CustomerController::class, 'simpanPesanan'])->name('customer.pesanan.store');
-Route::get('/customer/tracking', [CustomerController::class, 'tracking'])->name('customer.tracking');
-Route::post('/customer/tracking', [CustomerController::class, 'cariTracking'])->name('customer.tracking.search');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.process');
@@ -24,6 +19,16 @@ Route::get('/kurir/login', [AuthController::class, 'showKurirLogin'])->name('kur
 Route::post('/kurir/login', [AuthController::class, 'kurirLogin'])->name('kurir.login.process');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/customer', [HomeController::class, 'customer'])->name('customer.dashboard');
+Route::get('/customer/cek-ongkir', [CustomerController::class, 'cekOngkir'])->name('customer.cek-ongkir');
+Route::post('/customer/cek-ongkir', [CustomerController::class, 'prosesCekOngkir'])->name('customer.cek-ongkir.process');
+
+Route::get('/customer/pesanan/buat', [CustomerController::class, 'buatPesanan'])->name('customer.pesanan.create');
+Route::post('/customer/pesanan', [CustomerController::class, 'simpanPesanan'])->name('customer.pesanan.store');
+
+Route::get('/customer/tracking', [CustomerController::class, 'tracking'])->name('customer.tracking');
+Route::post('/customer/tracking', [CustomerController::class, 'cariTracking'])->name('customer.tracking.search');
 
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');

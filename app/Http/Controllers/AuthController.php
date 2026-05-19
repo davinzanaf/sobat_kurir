@@ -8,40 +8,41 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showAdminLogin()
+    public function showLogin()
     {
-        return view('auth.admin-login');
+        return view('auth.login');
     }
 
-    public function adminLogin(Request $request)
+    public function showAdminLogin()
     {
-        return $this->login($request, 'admin', 'admin.dashboard');
+        return view('auth.login');
     }
 
     public function showKurirLogin()
     {
-        return view('auth.kurir-login');
+        return view('auth.login');
     }
 
-    public function kurirLogin(Request $request)
-    {
-        return $this->login($request, 'kurir', 'kurir.dashboard');
-    }
-
-    private function login(Request $request, string $role, string $redirectRoute)
+    public function login(Request $request)
     {
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        $user = Pengguna::where('email', $request->email)
-            ->where('role', $role)
-            ->first();
+        $user = Pengguna::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()
                 ->withErrors(['email' => 'Email atau password salah.'])
+                ->withInput();
+        }
+
+        $statusAkun = $user->status_akun ?? 'AKTIF';
+
+        if ($statusAkun !== 'AKTIF') {
+            return back()
+                ->withErrors(['email' => 'Akun belum aktif atau masih menunggu persetujuan admin.'])
                 ->withInput();
         }
 
@@ -53,7 +54,24 @@ class AuthController extends Controller
             'nama_lengkap' => $user->nama_lengkap,
         ]);
 
-        return redirect()->route($redirectRoute);
+        return match ($user->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'kurir' => redirect()->route('kurir.dashboard'),
+            'customer' => redirect()->route('customer.dashboard'),
+            default => back()->withErrors([
+                'email' => 'Role akun tidak dikenali.',
+            ]),
+        };
+    }
+
+    public function adminLogin(Request $request)
+    {
+        return $this->login($request);
+    }
+
+    public function kurirLogin(Request $request)
+    {
+        return $this->login($request);
     }
 
     public function logout(Request $request)

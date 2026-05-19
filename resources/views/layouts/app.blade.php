@@ -356,35 +356,35 @@
             <a class="brand" href="{{ route('home') }}">Sobat Kurir</a>
 
             <div class="nav-links">
-                @if(session('role') === 'admin')
-                    <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-                    <a href="{{ route('admin.kurir.index') }}">Kurir</a>
-                    <a href="{{ route('admin.tarif.index') }}">Tarif</a>
-                    <a href="{{ route('admin.pesanan.index') }}">Pesanan</a>
-                @elseif(session('role') === 'kurir')
-                    <a href="{{ route('kurir.dashboard') }}">Dashboard</a>
-                    <a href="{{ route('kurir.tugas-baru') }}">Tugas Baru</a>
-                    <a href="{{ route('kurir.pesanan-saya') }}">Pesanan Saya</a>
-                @elseif(session('role') === 'customer')
-                    <a href="{{ route('customer.dashboard') }}">Dashboard</a>
-                    <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
-                    <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
-                    <a href="{{ route('customer.tracking') }}">Tracking</a>
-                @else
-                    <a href="{{ route('home') }}">Beranda</a>
-                    <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
-                    <a href="{{ route('customer.tracking') }}">Tracking</a>
-                    <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
-                    <a href="{{ route('admin.login') }}">Login</a>
-                @endif
+    @if(session('role') === 'admin')
+        <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+        <a href="{{ route('admin.kurir.index') }}">Kurir</a>
+        <a href="{{ route('admin.tarif.index') }}">Tarif</a>
+        <a href="{{ route('admin.pesanan.index') }}">Pesanan</a>
+    @elseif(session('role') === 'kurir')
+        <a href="{{ route('kurir.dashboard') }}">Dashboard</a>
+        <a href="{{ route('kurir.tugas-baru') }}">Tugas Baru</a>
+        <a href="{{ route('kurir.pesanan-saya') }}">Pesanan Saya</a>
+    @elseif(session('role') === 'customer')
+        <a href="{{ route('customer.dashboard') }}">Dashboard</a>
+        <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
+        <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
+        <a href="{{ route('customer.tracking') }}">Tracking</a>
+    @else
+        <a href="{{ route('home') }}">Beranda</a>
+        <a href="{{ route('customer.cek-ongkir') }}">Cek Ongkir</a>
+        <a href="{{ route('customer.pesanan.create') }}">Buat Pesanan</a>
+        <a href="{{ route('customer.tracking') }}">Tracking</a>
+        <a href="{{ route('login') }}">Login</a>
+    @endif
 
-                @if(session()->has('role'))
-                    <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-                        @csrf
-                        <button type="submit">Logout</button>
-                    </form>
-                @endif
-            </div>
+    @if(session()->has('role'))
+        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    @endif
+</div>
         </div>
     </nav>
 

@@ -11,7 +11,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!session()->has('role') || session('role') !== 'admin') {
-            return redirect()->route('admin.login')->withErrors([
+            return redirect()->route('login')->withErrors([
                 'auth' => 'Silakan login sebagai admin terlebih dahulu.',
             ]);
         }

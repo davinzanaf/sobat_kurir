@@ -11,7 +11,7 @@ class KurirMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!session()->has('role') || session('role') !== 'kurir') {
-            return redirect()->route('kurir.login')->withErrors([
+            return redirect()->route('login')->withErrors([
                 'auth' => 'Silakan login sebagai kurir terlebih dahulu.',
             ]);
         }
