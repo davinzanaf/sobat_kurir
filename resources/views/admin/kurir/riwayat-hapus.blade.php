@@ -5,25 +5,20 @@
 @section('content')
 <section class="bg-slate-50 px-5 py-10 lg:px-8">
     <div class="mx-auto max-w-7xl">
-        <div class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-            <div>
-                <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
-                    Riwayat Hapus Kurir
-                </p>
+        <x-back-button />
 
-                <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-                    Arsip Kurir yang Dihapus
-                </h1>
+        <div class="mb-8">
+            <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
+                Riwayat Hapus Kurir
+            </p>
 
-                <p class="mt-3 max-w-2xl leading-7 text-slate-600">
-                    Catatan kurir yang pernah dihapus beserta alasan penghapusan dari admin.
-                </p>
-            </div>
+            <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+                Arsip Kurir yang Dihapus
+            </h1>
 
-            <a href="{{ route('admin.kurir.index') }}"
-               class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-extrabold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
-                Kembali ke Kelola Kurir
-            </a>
+            <p class="mt-3 max-w-2xl leading-7 text-slate-600">
+                Catatan kurir yang pernah dihapus beserta alasan penghapusan dari admin.
+            </p>
         </div>
 
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

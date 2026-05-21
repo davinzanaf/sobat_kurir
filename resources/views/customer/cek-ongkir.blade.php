@@ -5,6 +5,8 @@
 @section('content')
 <section class="bg-slate-50 px-5 py-10 lg:px-8">
     <div class="mx-auto max-w-5xl">
+        <x-back-button />
+
         <div class="mb-8">
             <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
                 Cek Ongkir
@@ -91,11 +93,17 @@
                     </table>
                 </div>
 
-                <div class="mt-5">
-                    <a href="{{ route('customer.pesanan.create') }}" class="inline-flex rounded-xl bg-blue-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700">
-                        Buat Pesanan
-                    </a>
-                </div>
+                @if(session('role') === 'customer')
+                    <div class="mt-5">
+                        <a href="{{ route('customer.pesanan.create') }}" class="inline-flex rounded-xl bg-blue-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700">
+                            Buat Pesanan
+                        </a>
+                    </div>
+                @else
+                    <div class="mt-5 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-semibold leading-6 text-blue-800">
+                        Login sebagai customer untuk membuat pesanan.
+                    </div>
+                @endif
             </div>
         @endif
     </div>

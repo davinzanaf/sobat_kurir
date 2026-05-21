@@ -5,6 +5,8 @@
 @section('content')
 <section class="bg-slate-50 px-5 py-10 lg:px-8">
     <div class="mx-auto max-w-5xl">
+        <x-back-button />
+
         <div class="mb-8">
             <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
                 Tracking Resi

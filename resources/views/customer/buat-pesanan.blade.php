@@ -5,6 +5,8 @@
 @section('content')
 <section class="bg-slate-50 px-5 py-10 lg:px-8">
     <div class="mx-auto max-w-5xl">
+        <x-back-button />
+
         <div class="mb-8">
             <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
                 Buat Pesanan
@@ -108,10 +110,6 @@
                 <button type="submit" class="inline-flex h-12 items-center justify-center rounded-xl bg-blue-600 px-6 text-sm font-extrabold text-white transition hover:bg-blue-700">
                     Buat Pesanan
                 </button>
-
-                <a href="{{ route('customer.dashboard') }}" class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
-                    Kembali
-                </a>
             </div>
         </form>
     </div>

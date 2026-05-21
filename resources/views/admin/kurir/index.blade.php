@@ -5,6 +5,8 @@
 @section('content')
 <section class="bg-slate-50 px-5 py-10 lg:px-8">
     <div class="mx-auto max-w-7xl">
+        <x-back-button />
+
         <div class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
                 <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
