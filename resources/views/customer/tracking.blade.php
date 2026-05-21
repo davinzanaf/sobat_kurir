@@ -3,139 +3,109 @@
 @section('title', 'Tracking Resi - Sobat Kurir')
 
 @section('content')
-<div class="card">
-    <h2>Tracking Resi</h2>
-    <p class="muted">
-        Masukkan kode resi untuk melihat status dan riwayat pengiriman paket.
-    </p>
+<section class="bg-slate-50 px-5 py-10 lg:px-8">
+    <div class="mx-auto max-w-5xl">
+        <div class="mb-8">
+            <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
+                Tracking Resi
+            </p>
 
-    <form method="POST" action="{{ route('customer.tracking.search') }}">
-        @csrf
+            <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+                Lacak Paket Anda
+            </h1>
 
-        <div class="form-group">
-            <label>Kode Resi</label>
-            <input
-                type="text"
-                name="kode_resi"
-                value="{{ old('kode_resi', $kodeResi) }}"
-                placeholder="Contoh: SK2026041312170788"
-                required
-            >
+            <p class="mt-3 max-w-2xl leading-7 text-slate-600">
+                Masukkan kode resi untuk melihat status dan riwayat pengiriman.
+            </p>
         </div>
 
-        <div class="menu">
-            <button class="btn" type="submit">Cek Tracking</button>
-            <a class="btn btn-secondary" href="{{ route('customer.dashboard') }}">Kembali</a>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <form method="POST" action="{{ route('customer.tracking.search') }}" class="flex flex-col gap-3 md:flex-row">
+                @csrf
+
+                <input
+                    type="text"
+                    name="kode_resi"
+                    value="{{ old('kode_resi', $kodeResi) }}"
+                    placeholder="Contoh: SK2026041312170788"
+                    class="h-12 flex-1 rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    required
+                >
+
+                <button type="submit" class="h-12 rounded-xl bg-blue-600 px-6 text-sm font-extrabold text-white transition hover:bg-blue-700">
+                    Cek Tracking
+                </button>
+            </form>
         </div>
-    </form>
-</div>
 
-@if($kodeResi && !$pesanan)
-    <div class="card">
-        <h3>Resi tidak ditemukan</h3>
-        <p class="muted">
-            Tidak ada pesanan dengan kode resi <strong>{{ $kodeResi }}</strong>.
-            Pastikan kode resi yang dimasukkan sudah benar.
-        </p>
-    </div>
-@endif
-
-@if($pesanan)
-    <div class="card">
-        <h3>Detail Pesanan</h3>
-
-        <div class="table-responsive">
-            <table>
-                <tr>
-                    <th>Kode Resi</th>
-                    <td>{{ $pesanan->kode_resi }}</td>
-                </tr>
-                <tr>
-                    <th>Status Pesanan</th>
-                    <td>
-                        <span class="badge">{{ $pesanan->status_pesanan }}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Status Pembayaran</th>
-                    <td>{{ $pesanan->status_pembayaran }}</td>
-                </tr>
-                <tr>
-                    <th>Metode Pembayaran</th>
-                    <td>{{ $pesanan->metode_pembayaran }}</td>
-                </tr>
-                <tr>
-                    <th>Total Harga</th>
-                    <td>Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</td>
-                </tr>
-                <tr>
-                    <th>Kurir</th>
-                    <td>{{ $pesanan->kurir->nama_lengkap ?? 'Belum ditentukan' }}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Informasi Pengirim dan Penerima</h3>
-
-        <div class="table-responsive">
-            <table>
-                <tr>
-                    <th>Nama Pengirim</th>
-                    <td>{{ $pesanan->nama_pengirim }}</td>
-                </tr>
-                <tr>
-                    <th>No HP Pengirim</th>
-                    <td>{{ $pesanan->no_hp_pengirim }}</td>
-                </tr>
-                <tr>
-                    <th>Alamat Pengirim</th>
-                    <td>{{ $pesanan->alamat_pengirim }}</td>
-                </tr>
-                <tr>
-                    <th>Nama Penerima</th>
-                    <td>{{ $pesanan->nama_penerima }}</td>
-                </tr>
-                <tr>
-                    <th>No HP Penerima</th>
-                    <td>{{ $pesanan->no_hp_penerima }}</td>
-                </tr>
-                <tr>
-                    <th>Alamat Penerima</th>
-                    <td>{{ $pesanan->alamat_penerima }}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Riwayat Tracking</h3>
-
-        @if($pesanan->tracking->count() > 0)
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Waktu</th>
-                            <th>Keterangan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pesanan->tracking as $item)
-                            <tr>
-                                <td>
-                                    {{ $item->waktu_update ? $item->waktu_update->format('d-m-Y H:i') : '-' }}
-                                </td>
-                                <td>{{ $item->keterangan }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        @if($kodeResi && !$pesanan)
+            <div class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-6">
+                <h2 class="text-xl font-extrabold text-red-700">Resi tidak ditemukan</h2>
+                <p class="mt-2 leading-7 text-red-700">
+                    Tidak ada pesanan dengan kode resi <strong>{{ $kodeResi }}</strong>.
+                </p>
             </div>
-        @else
-            <p class="muted">Belum ada riwayat tracking untuk pesanan ini.</p>
+        @endif
+
+        @if($pesanan)
+            <div class="mt-6 grid gap-6 lg:grid-cols-2">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-slate-950">Detail Pesanan</h2>
+
+                    <div class="mt-5 overflow-x-auto">
+                        <table class="w-full min-w-[520px] text-left text-sm">
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <th class="w-48 bg-slate-50 px-4 py-3 font-bold text-slate-600">Kode Resi</th>
+                                    <td class="px-4 py-3 font-extrabold text-slate-950">{{ $pesanan->kode_resi }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-slate-50 px-4 py-3 font-bold text-slate-600">Status Pesanan</th>
+                                    <td class="px-4 py-3">
+                                        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                                            {{ $pesanan->status_pesanan }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-slate-50 px-4 py-3 font-bold text-slate-600">Pembayaran</th>
+                                    <td class="px-4 py-3 text-slate-700">{{ $pesanan->status_pembayaran }} / {{ $pesanan->metode_pembayaran }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-slate-50 px-4 py-3 font-bold text-slate-600">Total Harga</th>
+                                    <td class="px-4 py-3 font-bold text-slate-950">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-slate-50 px-4 py-3 font-bold text-slate-600">Kurir</th>
+                                    <td class="px-4 py-3 text-slate-700">{{ $pesanan->kurir->nama_lengkap ?? 'Belum ditentukan' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-slate-950">Riwayat Tracking</h2>
+
+                    <div class="mt-5 space-y-3">
+                        @forelse($pesanan->tracking as $item)
+                            <div class="rounded-2xl bg-slate-50 p-4">
+                                <p class="text-sm font-extrabold text-slate-950">
+                                    {{ $item->waktu_update ? $item->waktu_update->format('d-m-Y H:i') : '-' }}
+                                </p>
+                                <p class="mt-1 text-sm leading-6 text-slate-600">
+                                    {{ $item->keterangan }}
+                                </p>
+                            </div>
+                        @empty
+                            <p class="text-sm text-slate-500">
+                                Belum ada riwayat tracking.
+                            </p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
         @endif
     </div>
-@endif
+</section>
 @endsection
