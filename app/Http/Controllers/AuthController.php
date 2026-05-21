@@ -30,12 +30,20 @@ class AuthController extends Controller
 
     public function registerCustomer(Request $request)
     {
+        $request->merge([
+            'no_hp' => preg_replace('/[^0-9]/', '', $request->no_hp),
+        ]);
+
         $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:100', 'unique:tabel_users,email'],
-            'no_hp' => ['required', 'string', 'max:20'],
+            'no_hp' => ['required', 'digits_between:10,13'],
             'alamat' => ['required', 'string'],
             'password' => ['required', 'string', 'min:4', 'confirmed'],
+        ], [
+            'no_hp.required' => 'Nomor HP wajib diisi.',
+            'no_hp.digits_between' => 'Nomor HP harus berisi 10 sampai 13 digit angka.',
+            'password.confirmed' => 'Konfirmasi password tidak sama.',
         ]);
 
         Pengguna::create([
@@ -61,12 +69,20 @@ class AuthController extends Controller
 
     public function daftarKurir(Request $request)
     {
+        $request->merge([
+            'no_hp' => preg_replace('/[^0-9]/', '', $request->no_hp),
+        ]);
+
         $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:100', 'unique:tabel_users,email'],
-            'no_hp' => ['required', 'string', 'max:20'],
+            'no_hp' => ['required', 'digits_between:10,13'],
             'alamat' => ['required', 'string'],
             'password' => ['required', 'string', 'min:4', 'confirmed'],
+        ], [
+            'no_hp.required' => 'Nomor HP wajib diisi.',
+            'no_hp.digits_between' => 'Nomor HP harus berisi 10 sampai 13 digit angka.',
+            'password.confirmed' => 'Konfirmasi password tidak sama.',
         ]);
 
         Pengguna::create([
