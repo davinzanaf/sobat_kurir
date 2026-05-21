@@ -1,10 +1,15 @@
 @props([
-    'href' => url()->previous(),
+    'url' => null,
+    'href' => null,
     'label' => 'Kembali',
 ])
 
+@php
+    $targetUrl = $url ?? $href ?? url()->previous();
+@endphp
+
 <a
-    href="{{ $href }}"
+    href="{{ $targetUrl }}"
     {{ $attributes->merge([
         'class' => 'mb-5 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-extrabold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600'
     ]) }}

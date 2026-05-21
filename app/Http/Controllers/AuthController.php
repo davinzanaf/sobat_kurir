@@ -75,7 +75,7 @@ class AuthController extends Controller
 
         $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:100', 'unique:tabel_users,email'],
+            'email' => ['required', 'email', 'max:100'],
             'no_hp' => ['required', 'digits_between:10,13'],
             'alamat' => ['required', 'string'],
             'password' => ['required', 'string', 'min:4', 'confirmed'],
@@ -85,6 +85,35 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak sama.',
         ]);
 
+        $pengguna = Pengguna::where('email', $request->email)->first();
+
+        if ($pengguna && $pengguna->status_akun !== 'DITOLAK') {
+            return back()
+                ->withErrors([
+                    'email' => 'Email sudah terdaftar.',
+                ])
+                ->withInput();
+        }
+
+        if ($pengguna && $pengguna->status_akun === 'DITOLAK') {
+            $pengguna->nama_lengkap = $request->nama_lengkap;
+            $pengguna->email = $request->email;
+            $pengguna->no_hp = $request->no_hp;
+            $pengguna->alamat = $request->alamat;
+            $pengguna->password = Hash::make($request->password);
+            $pengguna->role = 'kurir';
+            $pengguna->status_akun = 'MENUNGGU';
+            $pengguna->alasan_tolak = null;
+            $pengguna->approved_at = null;
+            $pengguna->approved_by = null;
+            $pengguna->created_at = now();
+            $pengguna->save();
+
+            return redirect()
+                ->route('login')
+                ->with('success', 'Pendaftaran kurir berhasil dikirim ulang. Silakan tunggu persetujuan admin.');
+        }
+
         Pengguna::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
@@ -93,6 +122,9 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'kurir',
             'status_akun' => 'MENUNGGU',
+            'alasan_tolak' => null,
+            'approved_at' => null,
+            'approved_by' => null,
             'created_at' => now(),
         ]);
 
@@ -116,12 +148,17 @@ class AuthController extends Controller
                 ->withInput();
         }
 
+        if ($user->status_akun === 'DITOLAK') {
+            return back()
+                ->withErrors(['email' => 'Email atau password salah.'])
+                ->withInput();
+        }
+
         if ($user->status_akun !== 'AKTIF') {
             $pesan = match ($user->status_akun) {
                 'MENUNGGU' => 'Akun Anda masih menunggu persetujuan admin.',
-                'DITOLAK' => 'Pendaftaran akun Anda ditolak. Alasan: ' . ($user->alasan_ditolak ?? '-'),
                 'NONAKTIF' => 'Akun Anda sedang dinonaktifkan.',
-                default => 'Akun Anda belum bisa digunakan.',
+                default => 'Email atau password salah.',
             };
 
             return back()
@@ -142,7 +179,7 @@ class AuthController extends Controller
             'kurir' => redirect()->route('kurir.dashboard'),
             'customer' => redirect()->route('customer.dashboard'),
             default => back()->withErrors([
-                'email' => 'Role akun tidak dikenali.',
+                'email' => 'Email atau password salah.',
             ]),
         };
     }

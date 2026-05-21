@@ -90,12 +90,11 @@ class AdminController extends Controller
             ->where('id_user', $id)
             ->firstOrFail();
 
-        $kurir->update([
-            'status_akun' => 'AKTIF',
-            'approved_at' => now(),
-            'approved_by' => session('id_user'),
-            'alasan_ditolak' => null,
-        ]);
+        $kurir->status_akun = 'AKTIF';
+        $kurir->approved_at = now();
+        $kurir->approved_by = session('id_user');
+        $kurir->alasan_tolak = null;
+        $kurir->save();
 
         return redirect()
             ->route('admin.kurir.pendaftar')
@@ -105,7 +104,13 @@ class AdminController extends Controller
     public function rejectKurir(Request $request, $id)
     {
         $request->validate([
-            'alasan_ditolak' => ['required', 'string', 'max:255'],
+            'alasan_tolak' => ['required', 'string', 'in:Data kurir tidak valid,Dokumen tidak lengkap,Kendaraan tidak memenuhi syarat,Lainnya'],
+            'alasan_lainnya' => ['nullable', 'string', 'max:255', 'required_if:alasan_tolak,Lainnya'],
+        ], [
+            'alasan_tolak.required' => 'Alasan penolakan wajib dipilih.',
+            'alasan_tolak.in' => 'Alasan penolakan tidak valid.',
+            'alasan_lainnya.required_if' => 'Detail alasan wajib diisi jika memilih Lainnya.',
+            'alasan_lainnya.max' => 'Detail alasan maksimal 255 karakter.',
         ]);
 
         $kurir = Pengguna::where('role', 'kurir')
@@ -113,12 +118,15 @@ class AdminController extends Controller
             ->where('id_user', $id)
             ->firstOrFail();
 
-        $kurir->update([
-            'status_akun' => 'DITOLAK',
-            'alasan_ditolak' => $request->alasan_ditolak,
-            'approved_at' => null,
-            'approved_by' => session('id_user'),
-        ]);
+        $alasanFinal = $request->alasan_tolak === 'Lainnya'
+            ? $request->alasan_lainnya
+            : $request->alasan_tolak;
+
+        $kurir->status_akun = 'DITOLAK';
+        $kurir->alasan_tolak = $alasanFinal;
+        $kurir->approved_at = null;
+        $kurir->approved_by = session('id_user');
+        $kurir->save();
 
         return redirect()
             ->route('admin.kurir.pendaftar')
