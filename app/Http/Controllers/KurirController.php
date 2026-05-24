@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pesanan;
 use App\Models\Tracking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KurirController extends Controller
 {
@@ -17,6 +18,7 @@ class KurirController extends Controller
             ->count();
 
         $jumlahPesananSaya = Pesanan::where('id_kurir', $idKurir)
+            ->whereIn('status_pesanan', ['DIJEMPUT', 'DALAM_PENGIRIMAN'])
             ->count();
 
         return view('kurir.dashboard', compact(
@@ -39,21 +41,40 @@ class KurirController extends Controller
     {
         $idKurir = session('id_user');
 
-        $pesanan = Pesanan::whereNull('id_kurir')
-            ->where('status_pesanan', 'MENUNGGU_KURIR')
-            ->where('id_pesanan', $id)
-            ->firstOrFail();
+        $berhasil = false;
 
-        $pesanan->update([
-            'id_kurir' => $idKurir,
-            'status_pesanan' => 'DIJEMPUT',
-        ]);
+        DB::transaction(function () use ($id, $idKurir, &$berhasil) {
+            $pesanan = Pesanan::where('id_pesanan', $id)
+                ->whereNull('id_kurir')
+                ->where('status_pesanan', 'MENUNGGU_KURIR')
+                ->lockForUpdate()
+                ->first();
 
-        Tracking::create([
-            'id_pesanan' => $pesanan->id_pesanan,
-            'keterangan' => 'Pesanan telah diambil oleh kurir dan sedang dalam proses penjemputan.',
-            'waktu_update' => now(),
-        ]);
+            if (!$pesanan) {
+                return;
+            }
+
+            $pesanan->id_kurir = $idKurir;
+            $pesanan->status_pesanan = 'DIJEMPUT';
+            $pesanan->save();
+
+            Tracking::create([
+                'id_pesanan' => $pesanan->id_pesanan,
+                'keterangan' => 'Pesanan telah diambil oleh kurir.',
+                'waktu_update' => now(),
+                'created_at' => now(),
+            ]);
+
+            $berhasil = true;
+        });
+
+        if (!$berhasil) {
+            return redirect()
+                ->route('kurir.tugas-baru')
+                ->withErrors([
+                    'pesanan' => 'Pesanan ini sudah diambil oleh kurir lain atau sudah tidak tersedia.',
+                ]);
+        }
 
         return redirect()
             ->route('kurir.pesanan-saya')
@@ -62,9 +83,7 @@ class KurirController extends Controller
 
     public function pesananSaya()
     {
-        $idKurir = session('id_user');
-
-        $pesanan = Pesanan::where('id_kurir', $idKurir)
+        $pesanan = Pesanan::where('id_kurir', session('id_user'))
             ->orderBy('id_pesanan', 'desc')
             ->get();
 
@@ -75,35 +94,43 @@ class KurirController extends Controller
     {
         $request->validate([
             'status_pesanan' => ['required', 'in:DIJEMPUT,DALAM_PENGIRIMAN,SELESAI'],
+        ], [
+            'status_pesanan.required' => 'Status pesanan wajib dipilih.',
+            'status_pesanan.in' => 'Status pesanan tidak valid.',
         ]);
 
         $idKurir = session('id_user');
 
-        $pesanan = Pesanan::where('id_kurir', $idKurir)
-    ->where('id_pesanan', $id)
-    ->firstOrFail();
+        $pesanan = Pesanan::where('id_pesanan', $id)
+            ->where('id_kurir', $idKurir)
+            ->lockForUpdate()
+            ->firstOrFail();
 
-$dataUpdate = [
-    'status_pesanan' => $request->status_pesanan,
-];
+        DB::transaction(function () use ($pesanan, $request) {
+            $statusBaru = $request->status_pesanan;
 
-if ($request->status_pesanan === 'SELESAI' && $pesanan->metode_pembayaran === 'COD') {
-    $dataUpdate['status_pembayaran'] = 'SUDAH_BAYAR';
-}
+            $pesanan->status_pesanan = $statusBaru;
 
-$pesanan->update($dataUpdate);
+            if ($statusBaru === 'SELESAI' && $pesanan->metode_pembayaran === 'COD') {
+                $pesanan->status_pembayaran = 'SUDAH_BAYAR';
+            }
 
-$keterangan = match ($request->status_pesanan) {
-    'DIJEMPUT' => 'Paket sudah dijemput oleh kurir.',
-    'DALAM_PENGIRIMAN' => 'Paket sedang dalam perjalanan menuju alamat penerima.',
-    'SELESAI' => 'Paket sudah selesai diantar ke penerima.',
-};
+            $pesanan->save();
 
-        Tracking::create([
-            'id_pesanan' => $pesanan->id_pesanan,
-            'keterangan' => $keterangan,
-            'waktu_update' => now(),
-        ]);
+            $keterangan = match ($statusBaru) {
+                'DIJEMPUT' => 'Pesanan telah dijemput oleh kurir.',
+                'DALAM_PENGIRIMAN' => 'Pesanan sedang dalam pengiriman.',
+                'SELESAI' => 'Pesanan selesai dan telah diterima.',
+                default => 'Status pesanan diperbarui.',
+            };
+
+            Tracking::create([
+                'id_pesanan' => $pesanan->id_pesanan,
+                'keterangan' => $keterangan,
+                'waktu_update' => now(),
+                'created_at' => now(),
+            ]);
+        });
 
         return redirect()
             ->route('kurir.pesanan-saya')

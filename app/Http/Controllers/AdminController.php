@@ -51,12 +51,59 @@ class AdminController extends Controller
 
     public function kurirStore(Request $request)
     {
+        $request->merge([
+            'nama_lengkap' => trim($request->nama_lengkap),
+            'email' => strtolower(trim($request->email)),
+            'no_hp' => preg_replace('/[^0-9]/', '', $request->no_hp),
+        ]);
+
         $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:100', 'unique:tabel_users,email'],
-            'no_hp' => ['required', 'string', 'max:20'],
-            'password' => ['required', 'string', 'min:4'],
+            'email' => ['required', 'email', 'max:100'],
+            'no_hp' => ['required', 'digits_between:10,13'],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
+            ],
+        ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'no_hp.required' => 'Nomor HP wajib diisi.',
+            'no_hp.digits_between' => 'Nomor HP harus berisi 10 sampai 13 digit angka.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung huruf dan angka.',
         ]);
+
+        $pengguna = Pengguna::where('email', $request->email)->first();
+
+        if ($pengguna && $pengguna->status_akun !== 'DITOLAK') {
+            return back()
+                ->withErrors([
+                    'email' => 'Email sudah terdaftar.',
+                ])
+                ->withInput();
+        }
+
+        if ($pengguna && $pengguna->status_akun === 'DITOLAK') {
+            $pengguna->nama_lengkap = $request->nama_lengkap;
+            $pengguna->email = $request->email;
+            $pengguna->no_hp = $request->no_hp;
+            $pengguna->password = Hash::make($request->password);
+            $pengguna->role = 'kurir';
+            $pengguna->status_akun = 'AKTIF';
+            $pengguna->alasan_tolak = null;
+            $pengguna->approved_at = now();
+            $pengguna->approved_by = session('id_user');
+            $pengguna->save();
+
+            return redirect()
+                ->route('admin.kurir.index')
+                ->with('success', 'Kurir berhasil diaktifkan kembali.');
+        }
 
         Pengguna::create([
             'nama_lengkap' => $request->nama_lengkap,
@@ -65,6 +112,9 @@ class AdminController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'kurir',
             'status_akun' => 'AKTIF',
+            'alasan_tolak' => null,
+            'approved_at' => now(),
+            'approved_by' => session('id_user'),
             'created_at' => now(),
         ]);
 
@@ -119,7 +169,7 @@ class AdminController extends Controller
             ->firstOrFail();
 
         $alasanFinal = $request->alasan_tolak === 'Lainnya'
-            ? $request->alasan_lainnya
+            ? trim($request->alasan_lainnya)
             : $request->alasan_tolak;
 
         $kurir->status_akun = 'DITOLAK';
@@ -138,6 +188,10 @@ class AdminController extends Controller
         $request->validate([
             'alasan_hapus' => ['required', 'string', 'max:150'],
             'catatan_hapus' => ['nullable', 'string', 'max:255'],
+        ], [
+            'alasan_hapus.required' => 'Alasan hapus kurir wajib dipilih.',
+            'alasan_hapus.max' => 'Alasan hapus maksimal 150 karakter.',
+            'catatan_hapus.max' => 'Catatan hapus maksimal 255 karakter.',
         ]);
 
         $kurir = Pengguna::where('role', 'kurir')
@@ -147,7 +201,7 @@ class AdminController extends Controller
         $alasan = $request->alasan_hapus;
 
         if ($request->filled('catatan_hapus')) {
-            $alasan .= ' - ' . $request->catatan_hapus;
+            $alasan .= ' - ' . trim($request->catatan_hapus);
         }
 
         DB::transaction(function () use ($kurir, $alasan) {
@@ -163,6 +217,7 @@ class AdminController extends Controller
 
             Pesanan::where('id_kurir', $kurir->id_user)->update([
                 'id_kurir' => null,
+                'status_pesanan' => 'MENUNGGU_KURIR',
             ]);
 
             $kurir->delete();
@@ -194,11 +249,34 @@ class AdminController extends Controller
 
     public function tarifStore(Request $request)
     {
+        $request->merge([
+            'kecamatan_asal' => trim($request->kecamatan_asal),
+            'kecamatan_tujuan' => trim($request->kecamatan_tujuan),
+        ]);
+
         $request->validate([
             'kecamatan_asal' => ['required', 'string', 'max:100'],
             'kecamatan_tujuan' => ['required', 'string', 'max:100'],
-            'harga_per_kg' => ['required', 'numeric', 'min:0'],
+            'harga_per_kg' => ['required', 'numeric', 'min:1'],
+        ], [
+            'kecamatan_asal.required' => 'Kecamatan asal wajib diisi.',
+            'kecamatan_tujuan.required' => 'Kecamatan tujuan wajib diisi.',
+            'harga_per_kg.required' => 'Harga per kg wajib diisi.',
+            'harga_per_kg.numeric' => 'Harga per kg harus berupa angka.',
+            'harga_per_kg.min' => 'Harga per kg minimal 1.',
         ]);
+
+        $duplikat = Tarif::whereRaw('LOWER(kecamatan_asal) = ?', [strtolower($request->kecamatan_asal)])
+            ->whereRaw('LOWER(kecamatan_tujuan) = ?', [strtolower($request->kecamatan_tujuan)])
+            ->exists();
+
+        if ($duplikat) {
+            return back()
+                ->withErrors([
+                    'kecamatan_tujuan' => 'Tarif untuk rute kecamatan asal dan tujuan tersebut sudah terdaftar.',
+                ])
+                ->withInput();
+        }
 
         Tarif::create([
             'kecamatan_asal' => $request->kecamatan_asal,

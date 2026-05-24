@@ -31,20 +31,46 @@ class AuthController extends Controller
     public function registerCustomer(Request $request)
     {
         $request->merge([
+            'nama_lengkap' => trim($request->nama_lengkap),
+            'email' => strtolower(trim($request->email)),
             'no_hp' => preg_replace('/[^0-9]/', '', $request->no_hp),
+            'alamat' => trim($request->alamat),
         ]);
 
         $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:100', 'unique:tabel_users,email'],
+            'email' => ['required', 'email', 'max:100'],
             'no_hp' => ['required', 'digits_between:10,13'],
             'alamat' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:4', 'confirmed'],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
+            ],
         ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
             'no_hp.required' => 'Nomor HP wajib diisi.',
             'no_hp.digits_between' => 'Nomor HP harus berisi 10 sampai 13 digit angka.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak sama.',
+            'password.regex' => 'Password harus mengandung huruf dan angka.',
         ]);
+
+        $pengguna = Pengguna::where('email', $request->email)->first();
+
+        if ($pengguna) {
+            return back()
+                ->withErrors([
+                    'email' => 'Email sudah terdaftar.',
+                ])
+                ->withInput();
+        }
 
         Pengguna::create([
             'nama_lengkap' => $request->nama_lengkap,
@@ -70,7 +96,10 @@ class AuthController extends Controller
     public function daftarKurir(Request $request)
     {
         $request->merge([
+            'nama_lengkap' => trim($request->nama_lengkap),
+            'email' => strtolower(trim($request->email)),
             'no_hp' => preg_replace('/[^0-9]/', '', $request->no_hp),
+            'alamat' => trim($request->alamat),
         ]);
 
         $request->validate([
@@ -78,11 +107,24 @@ class AuthController extends Controller
             'email' => ['required', 'email', 'max:100'],
             'no_hp' => ['required', 'digits_between:10,13'],
             'alamat' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:4', 'confirmed'],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
+            ],
         ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
             'no_hp.required' => 'Nomor HP wajib diisi.',
             'no_hp.digits_between' => 'Nomor HP harus berisi 10 sampai 13 digit angka.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak sama.',
+            'password.regex' => 'Password harus mengandung huruf dan angka.',
         ]);
 
         $pengguna = Pengguna::where('email', $request->email)->first();
@@ -135,22 +177,34 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->merge([
+            'email' => strtolower(trim($request->email)),
+        ]);
+
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
         $user = Pengguna::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()
-                ->withErrors(['email' => 'Email atau password salah.'])
+                ->withErrors([
+                    'email' => 'Email atau password salah.',
+                ])
                 ->withInput();
         }
 
         if ($user->status_akun === 'DITOLAK') {
             return back()
-                ->withErrors(['email' => 'Email atau password salah.'])
+                ->withErrors([
+                    'email' => 'Email atau password salah.',
+                ])
                 ->withInput();
         }
 
@@ -162,7 +216,9 @@ class AuthController extends Controller
             };
 
             return back()
-                ->withErrors(['email' => $pesan])
+                ->withErrors([
+                    'email' => $pesan,
+                ])
                 ->withInput();
         }
 

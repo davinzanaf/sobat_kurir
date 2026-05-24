@@ -11,21 +11,38 @@ use Illuminate\Support\Str;
 class CustomerController extends Controller
 {
     public function dashboard()
-{
-    $jumlahPesanan = Pesanan::where('id_customer', session('id_user'))->count();
+    {
+        $idCustomer = session('id_user');
 
-    return view('customer.dashboard', compact('jumlahPesanan'));
-}
+        $jumlahPesanan = Pesanan::where('id_customer', $idCustomer)->count();
 
-public function riwayatPesanan()
-{
-    $pesanan = Pesanan::with('kurir')
-        ->where('id_customer', session('id_user'))
-        ->orderBy('id_pesanan', 'desc')
-        ->get();
+        $jumlahMenunggu = Pesanan::where('id_customer', $idCustomer)
+            ->where('status_pesanan', 'MENUNGGU_KURIR')
+            ->count();
 
-    return view('customer.riwayat-pesanan', compact('pesanan'));
-}
+        $jumlahDikirim = Pesanan::where('id_customer', $idCustomer)
+            ->whereIn('status_pesanan', ['DIJEMPUT', 'DALAM_PENGIRIMAN'])
+            ->count();
+
+        $jumlahSelesai = Pesanan::where('id_customer', $idCustomer)
+            ->where('status_pesanan', 'SELESAI')
+            ->count();
+
+        $pesananTerbaru = Pesanan::with('kurir')
+            ->where('id_customer', $idCustomer)
+            ->orderBy('id_pesanan', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('customer.dashboard', compact(
+            'jumlahPesanan',
+            'jumlahMenunggu',
+            'jumlahDikirim',
+            'jumlahSelesai',
+            'pesananTerbaru'
+        ));
+    }
+
     public function cekOngkir()
     {
         $kecamatanAsal = Tarif::select('kecamatan_asal')
@@ -38,24 +55,33 @@ public function riwayatPesanan()
             ->orderBy('kecamatan_tujuan')
             ->pluck('kecamatan_tujuan');
 
-        return view('customer.cek-ongkir', [
-            'kecamatanAsal' => $kecamatanAsal,
-            'kecamatanTujuan' => $kecamatanTujuan,
-            'hasil' => null,
-        ]);
+        $hasil = null;
+
+        return view('customer.cek-ongkir', compact(
+            'kecamatanAsal',
+            'kecamatanTujuan',
+            'hasil'
+        ));
     }
 
     public function prosesCekOngkir(Request $request)
     {
-        $request->validate([
-            'kecamatan_asal' => ['required', 'string'],
-            'kecamatan_tujuan' => ['required', 'string'],
-            'berat' => ['required', 'numeric', 'min:1'],
+        $request->merge([
+            'kecamatan_asal' => trim($request->kecamatan_asal),
+            'kecamatan_tujuan' => trim($request->kecamatan_tujuan),
         ]);
 
-        $tarif = Tarif::where('kecamatan_asal', $request->kecamatan_asal)
-            ->where('kecamatan_tujuan', $request->kecamatan_tujuan)
-            ->first();
+        $request->validate([
+            'kecamatan_asal' => ['required', 'string', 'max:100'],
+            'kecamatan_tujuan' => ['required', 'string', 'max:100'],
+            'berat' => ['required', 'numeric', 'min:1'],
+        ], [
+            'kecamatan_asal.required' => 'Kecamatan asal wajib dipilih.',
+            'kecamatan_tujuan.required' => 'Kecamatan tujuan wajib dipilih.',
+            'berat.required' => 'Berat paket wajib diisi.',
+            'berat.numeric' => 'Berat paket harus berupa angka.',
+            'berat.min' => 'Berat paket minimal 1 kg.',
+        ]);
 
         $kecamatanAsal = Tarif::select('kecamatan_asal')
             ->distinct()
@@ -67,27 +93,31 @@ public function riwayatPesanan()
             ->orderBy('kecamatan_tujuan')
             ->pluck('kecamatan_tujuan');
 
-    if (!$tarif) {
-        return back()
-            ->withErrors([
-                'tarif' => 'Tarif untuk kecamatan asal dan tujuan tersebut belum tersedia.',
-            ])
-        ->withInput();
-    }
+        $tarif = Tarif::whereRaw('LOWER(kecamatan_asal) = ?', [strtolower($request->kecamatan_asal)])
+            ->whereRaw('LOWER(kecamatan_tujuan) = ?', [strtolower($request->kecamatan_tujuan)])
+            ->first();
 
-        $totalHarga = $tarif->harga_per_kg * $request->berat;
+        if (!$tarif) {
+            return back()
+                ->withErrors([
+                    'kecamatan_tujuan' => 'Tarif untuk rute tersebut belum tersedia.',
+                ])
+                ->withInput();
+        }
 
-        return view('customer.cek-ongkir', [
-            'kecamatanAsal' => $kecamatanAsal,
-            'kecamatanTujuan' => $kecamatanTujuan,
-            'hasil' => [
-                'kecamatan_asal' => $request->kecamatan_asal,
-                'kecamatan_tujuan' => $request->kecamatan_tujuan,
-                'berat' => $request->berat,
-                'harga_per_kg' => $tarif->harga_per_kg,
-                'total_harga' => $totalHarga,
-            ],
-        ]);
+        $hasil = [
+            'kecamatan_asal' => $tarif->kecamatan_asal,
+            'kecamatan_tujuan' => $tarif->kecamatan_tujuan,
+            'berat' => $request->berat,
+            'harga_per_kg' => $tarif->harga_per_kg,
+            'total_harga' => $tarif->harga_per_kg * $request->berat,
+        ];
+
+        return view('customer.cek-ongkir', compact(
+            'kecamatanAsal',
+            'kecamatanTujuan',
+            'hasil'
+        ));
     }
 
     public function buatPesanan()
@@ -110,38 +140,66 @@ public function riwayatPesanan()
 
     public function simpanPesanan(Request $request)
     {
-        $request->validate([
-            'nama_pengirim' => ['required', 'string', 'max:100'],
-            'no_hp_pengirim' => ['required', 'string', 'max:20'],
-            'alamat_pengirim' => ['required', 'string'],
-            'nama_penerima' => ['required', 'string', 'max:100'],
-            'no_hp_penerima' => ['required', 'string', 'max:20'],
-            'alamat_penerima' => ['required', 'string'],
-            'kecamatan_asal' => ['required', 'string'],
-            'kecamatan_tujuan' => ['required', 'string'],
-            'berat' => ['required', 'numeric', 'min:1'],
-            'metode_pembayaran' => ['required', 'in:TRANSFER,COD'],
+        $request->merge([
+            'nama_pengirim' => trim($request->nama_pengirim),
+            'no_hp_pengirim' => preg_replace('/[^0-9]/', '', $request->no_hp_pengirim),
+            'alamat_pengirim' => trim($request->alamat_pengirim),
+            'nama_penerima' => trim($request->nama_penerima),
+            'no_hp_penerima' => preg_replace('/[^0-9]/', '', $request->no_hp_penerima),
+            'alamat_penerima' => trim($request->alamat_penerima),
+            'kecamatan_asal' => trim($request->kecamatan_asal),
+            'kecamatan_tujuan' => trim($request->kecamatan_tujuan),
+            'metode_pembayaran' => strtoupper(trim($request->metode_pembayaran)),
         ]);
 
-        $tarif = Tarif::where('kecamatan_asal', $request->kecamatan_asal)
-            ->where('kecamatan_tujuan', $request->kecamatan_tujuan)
+        $request->validate([
+            'nama_pengirim' => ['required', 'string', 'max:100'],
+            'no_hp_pengirim' => ['required', 'digits_between:10,13'],
+            'alamat_pengirim' => ['required', 'string'],
+            'nama_penerima' => ['required', 'string', 'max:100'],
+            'no_hp_penerima' => ['required', 'digits_between:10,13'],
+            'alamat_penerima' => ['required', 'string'],
+            'kecamatan_asal' => ['required', 'string', 'max:100'],
+            'kecamatan_tujuan' => ['required', 'string', 'max:100'],
+            'berat' => ['required', 'numeric', 'min:1'],
+            'metode_pembayaran' => ['required', 'in:TRANSFER,COD'],
+        ], [
+            'nama_pengirim.required' => 'Nama pengirim wajib diisi.',
+            'no_hp_pengirim.required' => 'Nomor HP pengirim wajib diisi.',
+            'no_hp_pengirim.digits_between' => 'Nomor HP pengirim harus 10 sampai 13 digit angka.',
+            'alamat_pengirim.required' => 'Alamat pengirim wajib diisi.',
+            'nama_penerima.required' => 'Nama penerima wajib diisi.',
+            'no_hp_penerima.required' => 'Nomor HP penerima wajib diisi.',
+            'no_hp_penerima.digits_between' => 'Nomor HP penerima harus 10 sampai 13 digit angka.',
+            'alamat_penerima.required' => 'Alamat penerima wajib diisi.',
+            'kecamatan_asal.required' => 'Kecamatan asal wajib dipilih.',
+            'kecamatan_tujuan.required' => 'Kecamatan tujuan wajib dipilih.',
+            'berat.required' => 'Berat paket wajib diisi.',
+            'berat.numeric' => 'Berat paket harus berupa angka.',
+            'berat.min' => 'Berat paket minimal 1 kg.',
+            'metode_pembayaran.required' => 'Metode pembayaran wajib dipilih.',
+            'metode_pembayaran.in' => 'Metode pembayaran tidak valid.',
+        ]);
+
+        $tarif = Tarif::whereRaw('LOWER(kecamatan_asal) = ?', [strtolower($request->kecamatan_asal)])
+            ->whereRaw('LOWER(kecamatan_tujuan) = ?', [strtolower($request->kecamatan_tujuan)])
             ->first();
 
         if (!$tarif) {
             return back()
                 ->withErrors([
-                    'tarif' => 'Tarif untuk kecamatan asal dan tujuan tersebut belum tersedia.',
+                    'kecamatan_tujuan' => 'Pesanan tidak bisa dibuat karena tarif untuk rute tersebut belum tersedia.',
                 ])
                 ->withInput();
         }
 
-        $totalHarga = $tarif->harga_per_kg * $request->berat;
+        $kodeResi = $this->generateKodeResi();
 
-        $kodeResi = 'SK' . now()->format('YmdHis') . strtoupper(Str::random(4));
+        $totalHarga = $tarif->harga_per_kg * $request->berat;
 
         $statusPembayaran = $request->metode_pembayaran === 'TRANSFER'
             ? 'SUDAH_BAYAR'
-            : 'BELUM_BAYAR';
+            : 'BELUM_DIBAYAR';
 
         $pesanan = Pesanan::create([
             'kode_resi' => $kodeResi,
@@ -158,50 +216,68 @@ public function riwayatPesanan()
             'metode_pembayaran' => $request->metode_pembayaran,
             'status_pembayaran' => $statusPembayaran,
             'status_pesanan' => 'MENUNGGU_KURIR',
-            'kecamatan_asal' => $request->kecamatan_asal,
-            'kecamatan_tujuan' => $request->kecamatan_tujuan,
+            'kecamatan_asal' => $tarif->kecamatan_asal,
+            'kecamatan_tujuan' => $tarif->kecamatan_tujuan,
             'created_at' => now(),
         ]);
 
         Tracking::create([
             'id_pesanan' => $pesanan->id_pesanan,
-            'keterangan' => 'Pesanan berhasil dibuat dan sedang menunggu kurir.',
+            'keterangan' => 'Pesanan dibuat dan menunggu kurir.',
             'waktu_update' => now(),
+            'created_at' => now(),
         ]);
 
         return redirect()
-            ->route('customer.tracking')
-            ->with('success', 'Pesanan berhasil dibuat. Kode resi kamu: ' . $kodeResi);
+            ->route('customer.riwayat-pesanan')
+            ->with('success', 'Pesanan berhasil dibuat. Kode resi Anda: ' . $kodeResi);
+    }
+
+    public function riwayatPesanan()
+    {
+        $pesanan = Pesanan::with('kurir')
+            ->where('id_customer', session('id_user'))
+            ->orderBy('id_pesanan', 'desc')
+            ->get();
+
+        return view('customer.riwayat-pesanan', compact('pesanan'));
     }
 
     public function tracking()
     {
-        return view('customer.tracking', [
-            'pesanan' => null,
-            'kodeResi' => null,
-        ]);
+        $kodeResi = null;
+        $pesanan = null;
+
+        return view('customer.tracking', compact('kodeResi', 'pesanan'));
     }
 
     public function cariTracking(Request $request)
     {
-        $request->validate([
-            'kode_resi' => ['required', 'string', 'max:30'],
+        $request->merge([
+            'kode_resi' => strtoupper(trim($request->kode_resi)),
         ]);
 
-        $kodeResi = strtoupper(trim($request->kode_resi));
+        $request->validate([
+            'kode_resi' => ['required', 'string', 'max:50'],
+        ], [
+            'kode_resi.required' => 'Kode resi wajib diisi.',
+        ]);
 
-        $pesanan = Pesanan::with([
-                'kurir',
-                'tracking' => function ($query) {
-                    $query->orderBy('waktu_update', 'desc');
-                },
-            ])
+        $kodeResi = $request->kode_resi;
+
+        $pesanan = Pesanan::with(['kurir', 'tracking'])
             ->where('kode_resi', $kodeResi)
             ->first();
 
-        return view('customer.tracking', [
-            'pesanan' => $pesanan,
-            'kodeResi' => $kodeResi,
-        ]);
+        return view('customer.tracking', compact('kodeResi', 'pesanan'));
+    }
+
+    private function generateKodeResi()
+    {
+        do {
+            $kodeResi = 'SK' . now()->format('YmdHis') . Str::upper(Str::random(4));
+        } while (Pesanan::where('kode_resi', $kodeResi)->exists());
+
+        return $kodeResi;
     }
 }
