@@ -35,7 +35,54 @@
             </div>
         </div>
 
+        <div class="mb-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <form method="GET" action="{{ route('admin.kurir.index') }}" class="flex flex-col gap-3 md:flex-row">
+                <div class="flex-1">
+                    <label class="mb-2 block text-sm font-bold text-slate-700">
+                        Cari Kurir
+                    </label>
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ $q ?? request('q') }}"
+                        placeholder="Cari nama, email, atau nomor HP..."
+                        class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    >
+                </div>
+
+                <div class="flex items-end gap-3">
+                    <button
+                        type="submit"
+                        class="h-12 rounded-xl bg-blue-600 px-6 text-sm font-extrabold text-white transition hover:bg-blue-700"
+                    >
+                        Cari
+                    </button>
+
+                    <a
+                        href="{{ route('admin.kurir.index') }}"
+                        class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-sm font-extrabold text-slate-700 transition hover:border-blue-200 hover:text-blue-600"
+                    >
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                <p class="text-sm font-bold text-slate-700">
+                    Total Data: {{ $kurir->count() }}
+                </p>
+
+                @if(($q ?? '') !== '')
+                    <p class="text-sm text-slate-500">
+                        Hasil pencarian untuk:
+                        <span class="font-bold text-slate-900">"{{ $q }}"</span>
+                    </p>
+                @endif
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[950px] text-left text-sm">
                     <thead>
@@ -117,17 +164,22 @@
                                 <td colspan="6" class="px-4 py-12 text-center">
                                     <div class="mx-auto max-w-md">
                                         <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="h-6 w-6"
+                                                 fill="none"
+                                                 viewBox="0 0 24 24"
+                                                 stroke="currentColor"
+                                                 stroke-width="1.8">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 1115 0" />
                                             </svg>
                                         </div>
 
                                         <h3 class="mt-4 font-extrabold text-slate-950">
-                                            Belum ada kurir aktif
+                                            Data kurir tidak ditemukan
                                         </h3>
 
                                         <p class="mt-2 text-sm leading-6 text-slate-500">
-                                            Tambahkan kurir baru atau setujui pendaftar kurir terlebih dahulu.
+                                            Coba gunakan kata kunci lain atau reset pencarian.
                                         </p>
                                     </div>
                                 </td>

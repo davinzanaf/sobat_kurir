@@ -233,14 +233,23 @@ class CustomerController extends Controller
             ->with('success', 'Pesanan berhasil dibuat. Kode resi Anda: ' . $kodeResi);
     }
 
-    public function riwayatPesanan()
+    public function riwayatPesanan(Request $request)
     {
+        $q = trim($request->get('q', ''));
+
         $pesanan = Pesanan::with('kurir')
             ->where('id_customer', session('id_user'))
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($subQuery) use ($q) {
+                    $subQuery->where('kode_resi', 'like', '%' . $q . '%')
+                        ->orWhere('nama_penerima', 'like', '%' . $q . '%')
+                        ->orWhere('nama_pengirim', 'like', '%' . $q . '%');
+                });
+            })
             ->orderBy('id_pesanan', 'desc')
             ->get();
 
-        return view('customer.riwayat-pesanan', compact('pesanan'));
+        return view('customer.riwayat-pesanan', compact('pesanan', 'q'));
     }
 
     public function tracking()

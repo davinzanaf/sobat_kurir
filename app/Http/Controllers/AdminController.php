@@ -34,14 +34,23 @@ class AdminController extends Controller
         ));
     }
 
-    public function kurir()
+    public function kurir(Request $request)
     {
+        $q = trim($request->get('q', ''));
+
         $kurir = Pengguna::where('role', 'kurir')
             ->where('status_akun', 'AKTIF')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($subQuery) use ($q) {
+                    $subQuery->where('nama_lengkap', 'like', '%' . $q . '%')
+                        ->orWhere('email', 'like', '%' . $q . '%')
+                        ->orWhere('no_hp', 'like', '%' . $q . '%');
+                });
+            })
             ->orderBy('id_user', 'desc')
             ->get();
 
-        return view('admin.kurir.index', compact('kurir'));
+        return view('admin.kurir.index', compact('kurir', 'q'));
     }
 
     public function kurirCreate()
@@ -235,11 +244,20 @@ class AdminController extends Controller
         return view('admin.kurir.riwayat-hapus', compact('riwayat'));
     }
 
-    public function tarif()
+    public function tarif(Request $request)
     {
-        $tarif = Tarif::orderBy('id_tarif', 'desc')->get();
+        $q = trim($request->get('q', ''));
 
-        return view('admin.tarif.index', compact('tarif'));
+        $tarif = Tarif::when($q !== '', function ($query) use ($q) {
+                $query->where(function ($subQuery) use ($q) {
+                    $subQuery->where('kecamatan_asal', 'like', '%' . $q . '%')
+                        ->orWhere('kecamatan_tujuan', 'like', '%' . $q . '%');
+                });
+            })
+            ->orderBy('id_tarif', 'desc')
+            ->get();
+
+        return view('admin.tarif.index', compact('tarif', 'q'));
     }
 
     public function tarifCreate()
@@ -301,12 +319,22 @@ class AdminController extends Controller
             ->with('success', 'Tarif berhasil dihapus.');
     }
 
-    public function pesanan()
+    public function pesanan(Request $request)
     {
+        $q = trim($request->get('q', ''));
+
         $pesanan = Pesanan::with('kurir')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($subQuery) use ($q) {
+                    $subQuery->where('kode_resi', 'like', '%' . $q . '%')
+                        ->orWhere('nama_penerima', 'like', '%' . $q . '%')
+                        ->orWhere('nama_pengirim', 'like', '%' . $q . '%')
+                        ->orWhere('no_hp_penerima', 'like', '%' . $q . '%');
+                });
+            })
             ->orderBy('id_pesanan', 'desc')
             ->get();
 
-        return view('admin.pesanan.index', compact('pesanan'));
+        return view('admin.pesanan.index', compact('pesanan', 'q'));
     }
 }
