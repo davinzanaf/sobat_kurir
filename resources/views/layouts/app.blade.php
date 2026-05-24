@@ -107,7 +107,7 @@
 
                     <div class="flex items-center gap-3">
                         <div class="hidden text-right sm:block">
-                            <p class="max-w-[160px] truncate text-sm font-extrabold text-slate-950">
+                            <p class="max-w-40 truncate text-sm font-extrabold text-slate-950">
                                 {{ $namaUser }}
                             </p>
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
