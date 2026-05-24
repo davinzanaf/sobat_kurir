@@ -36,12 +36,17 @@ Route::post('/customer/cek-ongkir', [CustomerController::class, 'prosesCekOngkir
 Route::get('/customer/tracking', [CustomerController::class, 'tracking'])->name('customer.tracking');
 Route::post('/customer/tracking', [CustomerController::class, 'cariTracking'])->name('customer.tracking.search');
 
-Route::prefix('owner')->name('owner.')->group(function () {
+Route::middleware('owner')->prefix('owner')->name('owner.')->group(function () {
     Route::get('/dashboard', [OwnerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/laporan-keuangan/pdf', [OwnerController::class, 'cetakLaporanPdf'])->name('laporan-keuangan.pdf');
 });
 
-Route::prefix('supervisor')->name('supervisor.')->group(function () {
+Route::middleware('supervisor')->prefix('supervisor')->name('supervisor.')->group(function () {
     Route::get('/dashboard', [SupervisorController::class, 'dashboard'])->name('dashboard');
+    Route::get('/laporan-kinerja/pdf', [SupervisorController::class, 'cetakKinerjaPdf'])->name('laporan-kinerja.pdf');
+
+    Route::patch('/approval/{type}/{id}/approve', [SupervisorController::class, 'approveAction'])->name('approval.approve');
+    Route::patch('/approval/{type}/{id}/reject', [SupervisorController::class, 'rejectAction'])->name('approval.reject');
 });
 
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {

@@ -20,7 +20,7 @@
         </div>
 
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <form method="POST" action="{{ route('register.kurir.process') }}" class="grid gap-5">
+            <form method="POST" action="{{ route('kurir.daftar.process') }}" class="grid gap-5">
                 @csrf
 
                 <div>

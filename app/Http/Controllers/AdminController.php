@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Pengguna;
 use App\Models\Pesanan;
 use App\Models\RiwayatHapusKurir;
@@ -16,13 +17,16 @@ class AdminController extends Controller
     {
         $jumlahKurir = Pengguna::where('role', 'kurir')
             ->where('status_akun', 'AKTIF')
+            ->where('approval_status', 'approved')
             ->count();
 
         $jumlahPendaftarKurir = Pengguna::where('role', 'kurir')
-            ->where('status_akun', 'MENUNGGU')
+            ->whereIn('status_akun', ['MENUNGGU'])
             ->count();
 
-        $jumlahTarif = Tarif::count();
+        $jumlahTarif = Tarif::where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
+            ->count();
 
         $jumlahPesanan = Pesanan::count();
 
@@ -40,6 +44,7 @@ class AdminController extends Controller
 
         $kurir = Pengguna::where('role', 'kurir')
             ->where('status_akun', 'AKTIF')
+            ->where('approval_status', 'approved')
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($subQuery) use ($q) {
                     $subQuery->where('nama_lengkap', 'like', '%' . $q . '%')
@@ -87,9 +92,11 @@ class AdminController extends Controller
             'password.regex' => 'Password harus mengandung huruf dan angka.',
         ]);
 
-        $pengguna = Pengguna::where('email', $request->email)->first();
+        $pengguna = Pengguna::withTrashed()
+            ->where('email', $request->email)
+            ->first();
 
-        if ($pengguna && $pengguna->status_akun !== 'DITOLAK') {
+        if ($pengguna && $pengguna->approval_status !== 'rejected' && $pengguna->status_akun !== 'DITOLAK') {
             return back()
                 ->withErrors([
                     'email' => 'Email sudah terdaftar.',
@@ -97,39 +104,60 @@ class AdminController extends Controller
                 ->withInput();
         }
 
-        if ($pengguna && $pengguna->status_akun === 'DITOLAK') {
+        if ($pengguna && ($pengguna->approval_status === 'rejected' || $pengguna->status_akun === 'DITOLAK')) {
+            $pengguna->restore();
+
             $pengguna->nama_lengkap = $request->nama_lengkap;
             $pengguna->email = $request->email;
             $pengguna->no_hp = $request->no_hp;
             $pengguna->password = Hash::make($request->password);
             $pengguna->role = 'kurir';
-            $pengguna->status_akun = 'AKTIF';
+            $pengguna->status_akun = 'MENUNGGU';
+            $pengguna->approval_status = 'pending_approval';
             $pengguna->alasan_tolak = null;
-            $pengguna->approved_at = now();
-            $pengguna->approved_by = session('id_user');
+            $pengguna->approved_at = null;
+            $pengguna->approved_by = null;
+            $pengguna->rejected_at = null;
+            $pengguna->rejected_by = null;
+            $pengguna->rejected_reason = null;
+            $pengguna->created_at = now();
             $pengguna->save();
+
+            ActivityLog::record(
+                'REQUEST_KURIR_APPROVAL',
+                'Admin ' . session('nama_lengkap') . ' mengajukan ulang kurir ' . $pengguna->nama_lengkap . ' untuk approval.'
+            );
 
             return redirect()
                 ->route('admin.kurir.index')
-                ->with('success', 'Kurir berhasil diaktifkan kembali.');
+                ->with('success', 'Kurir berhasil diajukan ulang dan menunggu approval supervisor/owner.');
         }
 
-        Pengguna::create([
+        $kurir = Pengguna::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
             'no_hp' => $request->no_hp,
             'password' => Hash::make($request->password),
             'role' => 'kurir',
-            'status_akun' => 'AKTIF',
+            'status_akun' => 'MENUNGGU',
+            'approval_status' => 'pending_approval',
             'alasan_tolak' => null,
-            'approved_at' => now(),
-            'approved_by' => session('id_user'),
+            'approved_at' => null,
+            'approved_by' => null,
+            'rejected_at' => null,
+            'rejected_by' => null,
+            'rejected_reason' => null,
             'created_at' => now(),
         ]);
 
+        ActivityLog::record(
+            'REQUEST_KURIR_APPROVAL',
+            'Admin ' . session('nama_lengkap') . ' menambahkan kurir baru ' . $kurir->nama_lengkap . ' dan menunggu approval supervisor/owner.'
+        );
+
         return redirect()
             ->route('admin.kurir.index')
-            ->with('success', 'Kurir berhasil ditambahkan.');
+            ->with('success', 'Kurir berhasil diajukan. Status menunggu approval supervisor/owner.');
     }
 
     public function pendaftarKurir()
@@ -149,15 +177,21 @@ class AdminController extends Controller
             ->where('id_user', $id)
             ->firstOrFail();
 
-        $kurir->status_akun = 'AKTIF';
-        $kurir->approved_at = now();
-        $kurir->approved_by = session('id_user');
+        $kurir->approval_status = 'pending_approval';
+        $kurir->status_akun = 'MENUNGGU';
+        $kurir->approved_at = null;
+        $kurir->approved_by = null;
         $kurir->alasan_tolak = null;
         $kurir->save();
 
+        ActivityLog::record(
+            'REQUEST_KURIR_APPROVAL',
+            'Admin ' . session('nama_lengkap') . ' mengirim pendaftar kurir ' . $kurir->nama_lengkap . ' ke antrean approval supervisor/owner.'
+        );
+
         return redirect()
             ->route('admin.kurir.pendaftar')
-            ->with('success', 'Pendaftar kurir berhasil disetujui.');
+            ->with('success', 'Pendaftar kurir dikirim ke antrean approval supervisor/owner.');
     }
 
     public function rejectKurir(Request $request, $id)
@@ -182,10 +216,19 @@ class AdminController extends Controller
             : $request->alasan_tolak;
 
         $kurir->status_akun = 'DITOLAK';
+        $kurir->approval_status = 'rejected';
         $kurir->alasan_tolak = $alasanFinal;
+        $kurir->rejected_at = now();
+        $kurir->rejected_by = session('id_user');
+        $kurir->rejected_reason = $alasanFinal;
         $kurir->approved_at = null;
-        $kurir->approved_by = session('id_user');
+        $kurir->approved_by = null;
         $kurir->save();
+
+        ActivityLog::record(
+            'REJECT_KURIR_BY_ADMIN',
+            'Admin ' . session('nama_lengkap') . ' menolak pendaftar kurir ' . $kurir->nama_lengkap . '. Alasan: ' . $alasanFinal
+        );
 
         return redirect()
             ->route('admin.kurir.pendaftar')
@@ -229,7 +272,13 @@ class AdminController extends Controller
                 'status_pesanan' => 'MENUNGGU_KURIR',
             ]);
 
+            $namaKurir = $kurir->nama_lengkap;
             $kurir->delete();
+
+            ActivityLog::record(
+                'SOFT_DELETE_KURIR',
+                'Admin ' . session('nama_lengkap') . ' menghapus kurir ' . $namaKurir . '. Alasan: ' . $alasan
+            );
         });
 
         return redirect()
@@ -249,11 +298,11 @@ class AdminController extends Controller
         $q = trim($request->get('q', ''));
 
         $tarif = Tarif::when($q !== '', function ($query) use ($q) {
-                $query->where(function ($subQuery) use ($q) {
-                    $subQuery->where('kecamatan_asal', 'like', '%' . $q . '%')
-                        ->orWhere('kecamatan_tujuan', 'like', '%' . $q . '%');
-                });
-            })
+            $query->where(function ($subQuery) use ($q) {
+                $subQuery->where('kecamatan_asal', 'like', '%' . $q . '%')
+                    ->orWhere('kecamatan_tujuan', 'like', '%' . $q . '%');
+            });
+        })
             ->orderBy('id_tarif', 'desc')
             ->get();
 
@@ -286,33 +335,53 @@ class AdminController extends Controller
 
         $duplikat = Tarif::whereRaw('LOWER(kecamatan_asal) = ?', [strtolower($request->kecamatan_asal)])
             ->whereRaw('LOWER(kecamatan_tujuan) = ?', [strtolower($request->kecamatan_tujuan)])
+            ->whereIn('approval_status', ['approved', 'pending_approval'])
             ->exists();
 
         if ($duplikat) {
             return back()
                 ->withErrors([
-                    'kecamatan_tujuan' => 'Tarif untuk rute kecamatan asal dan tujuan tersebut sudah terdaftar.',
+                    'kecamatan_tujuan' => 'Tarif untuk rute kecamatan asal dan tujuan tersebut sudah terdaftar atau sedang menunggu approval.',
                 ])
                 ->withInput();
         }
 
-        Tarif::create([
+        $tarif = Tarif::create([
             'kecamatan_asal' => $request->kecamatan_asal,
             'kecamatan_tujuan' => $request->kecamatan_tujuan,
             'harga_per_kg' => $request->harga_per_kg,
-            'created_at' => now(),
+            'approval_status' => 'pending_approval',
+            'status_tarif' => 'menunggu_approval',
+            'created_by' => session('id_user'),
+            'approved_at' => null,
+            'approved_by' => null,
+            'rejected_at' => null,
+            'rejected_by' => null,
+            'rejected_reason' => null,
         ]);
+
+        ActivityLog::record(
+            'REQUEST_TARIF_APPROVAL',
+            'Admin ' . session('nama_lengkap') . ' menambahkan tarif ' . $tarif->kecamatan_asal . ' ke ' . $tarif->kecamatan_tujuan . ' dan menunggu approval supervisor/owner.'
+        );
 
         return redirect()
             ->route('admin.tarif.index')
-            ->with('success', 'Tarif berhasil ditambahkan.');
+            ->with('success', 'Tarif berhasil diajukan. Status menunggu approval supervisor/owner.');
     }
 
     public function tarifDestroy($id)
     {
         $tarif = Tarif::where('id_tarif', $id)->firstOrFail();
 
+        $rute = $tarif->kecamatan_asal . ' ke ' . $tarif->kecamatan_tujuan;
+
         $tarif->delete();
+
+        ActivityLog::record(
+            'SOFT_DELETE_TARIF',
+            'Admin ' . session('nama_lengkap') . ' menghapus tarif ' . $rute . '.'
+        );
 
         return redirect()
             ->route('admin.tarif.index')

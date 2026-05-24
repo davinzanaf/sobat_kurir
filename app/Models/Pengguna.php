@@ -3,40 +3,56 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pengguna extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'tabel_users';
 
     protected $primaryKey = 'id_user';
+
+    public $incrementing = true;
+
+    protected $keyType = 'int';
 
     public $timestamps = false;
 
     protected $fillable = [
         'nama_lengkap',
         'email',
-        'password',
         'no_hp',
         'alamat',
+        'password',
         'role',
         'status_akun',
-        'alasan_ditolak',
+        'approval_status',
+        'alasan_tolak',
         'approved_at',
         'approved_by',
+        'rejected_at',
+        'rejected_by',
+        'rejected_reason',
         'created_at',
+        'deleted_at',
     ];
 
-    protected $hidden = [
-        'password',
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
+        'created_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
-    public function pesananCustomer()
-    {
-        return $this->hasMany(Pesanan::class, 'id_customer', 'id_user');
-    }
-
-    public function pesananKurir()
+    public function pesananKurir(): HasMany
     {
         return $this->hasMany(Pesanan::class, 'id_kurir', 'id_user');
+    }
+
+    public function pesananCustomer(): HasMany
+    {
+        return $this->hasMany(Pesanan::class, 'id_customer', 'id_user');
     }
 }

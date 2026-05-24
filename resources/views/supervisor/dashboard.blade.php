@@ -5,82 +5,246 @@
 @section('content')
 <section class="bg-slate-50 px-5 py-10 lg:px-8">
     <div class="mx-auto max-w-7xl">
-        <div class="mb-8">
-            <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
-                Dashboard Supervisor
-            </p>
+        <div class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div>
+                <p class="text-sm font-bold uppercase tracking-wider text-blue-600">
+                    Dashboard Supervisor
+                </p>
 
-            <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-                Selamat datang, Supervisor!
-            </h1>
+                <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+                    Selamat datang, Supervisor!
+                </h1>
 
-            <p class="mt-3 max-w-2xl leading-7 text-slate-600">
-                Halaman ini akan digunakan untuk memantau aktivitas kurir, status pengiriman, dan kinerja operasional harian.
-            </p>
+                <p class="mt-3 max-w-2xl leading-7 text-slate-600">
+                    Pantau performa kurir dan setujui data penting yang diajukan admin.
+                </p>
+            </div>
+
+            <a href="{{ route('supervisor.laporan-kinerja.pdf') }}"
+               class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700">
+                Export PDF Kinerja
+            </a>
         </div>
 
         <div class="grid gap-5 md:grid-cols-3">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-6 w-6"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor"
-                         stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h7.5m-10.5 0H3.375A1.125 1.125 0 012.25 17.625V6.375c0-.621.504-1.125 1.125-1.125h10.5C14.496 5.25 15 5.754 15 6.375v11.25m-6.75 1.125h7.5m0 0a1.5 1.5 0 003 0m-3 0a1.5 1.5 0 013 0m0 0h1.125c.621 0 1.125-.504 1.125-1.125V12.75L18.75 9h-3.75" />
-                    </svg>
-                </div>
-
-                <h2 class="mt-5 text-lg font-extrabold text-slate-950">
-                    Monitoring Pengiriman
+                <p class="text-sm font-bold uppercase tracking-wider text-slate-500">Kurir Terdaftar</p>
+                <h2 class="mt-3 text-3xl font-extrabold text-slate-950">
+                    {{ $kinerjaKurir->count() }}
                 </h2>
-
-                <p class="mt-2 text-sm leading-6 text-slate-600">
-                    Placeholder untuk daftar pengiriman aktif, pesanan terlambat, dan status paket.
-                </p>
+                <p class="mt-2 text-sm text-slate-500">Kurir aktif yang telah disetujui</p>
             </div>
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50 text-green-600">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-6 w-6"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor"
-                         stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 1115 0" />
-                    </svg>
-                </div>
-
-                <h2 class="mt-5 text-lg font-extrabold text-slate-950">
-                    Performa Kurir
+                <p class="text-sm font-bold uppercase tracking-wider text-slate-500">Pending Tarif</p>
+                <h2 class="mt-3 text-3xl font-extrabold text-slate-950">
+                    {{ $pendingTarif->count() }}
                 </h2>
-
-                <p class="mt-2 text-sm leading-6 text-slate-600">
-                    Placeholder untuk performa kurir, jumlah pesanan selesai, dan aktivitas harian.
-                </p>
+                <p class="mt-2 text-sm text-slate-500">Menunggu approval tarif</p>
             </div>
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-6 w-6"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor"
-                         stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <p class="text-sm font-bold uppercase tracking-wider text-slate-500">Pending Kurir</p>
+                <h2 class="mt-3 text-3xl font-extrabold text-slate-950">
+                    {{ $pendingKurir->count() }}
+                </h2>
+                <p class="mt-2 text-sm text-slate-500">Menunggu approval kurir</p>
+            </div>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="mb-5">
+                <h2 class="text-xl font-extrabold text-slate-950">
+                    KPI Performa Kurir
+                </h2>
+                <p class="mt-2 text-sm text-slate-500">
+                    Perbandingan paket sukses, gagal, dan total paket yang ditangani kurir.
+                </p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[780px] text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50 text-slate-600">
+                            <th class="px-4 py-3 font-bold">No</th>
+                            <th class="px-4 py-3 font-bold">Nama Kurir</th>
+                            <th class="px-4 py-3 font-bold">Email</th>
+                            <th class="px-4 py-3 font-bold">Paket Sukses</th>
+                            <th class="px-4 py-3 font-bold">Paket Gagal</th>
+                            <th class="px-4 py-3 font-bold">Total Paket</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($kinerjaKurir as $kurir)
+                            <tr>
+                                <td class="px-4 py-4 text-slate-600">{{ $loop->iteration }}</td>
+                                <td class="px-4 py-4 font-bold text-slate-950">{{ $kurir->nama_lengkap }}</td>
+                                <td class="px-4 py-4 text-slate-600">{{ $kurir->email }}</td>
+                                <td class="px-4 py-4 font-bold text-green-700">{{ $kurir->paket_sukses }}</td>
+                                <td class="px-4 py-4 font-bold text-red-700">{{ $kurir->paket_gagal }}</td>
+                                <td class="px-4 py-4 font-bold text-slate-950">{{ $kurir->paket_total }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-4 py-10 text-center text-slate-500">
+                                    Belum ada data kinerja kurir.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="mb-5">
+                    <h2 class="text-xl font-extrabold text-slate-950">
+                        Approval Tarif
+                    </h2>
+                    <p class="mt-2 text-sm text-slate-500">
+                        Tarif yang diajukan admin tidak aktif sebelum disetujui.
+                    </p>
                 </div>
 
-                <h2 class="mt-5 text-lg font-extrabold text-slate-950">
-                    Validasi Operasional
-                </h2>
+                <div class="space-y-4">
+                    @forelse($pendingTarif as $tarif)
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div>
+                                    <p class="font-extrabold text-slate-950">
+                                        {{ $tarif->kecamatan_asal }} → {{ $tarif->kecamatan_tujuan }}
+                                    </p>
+                                    <p class="mt-1 text-sm text-slate-500">
+                                        Rp {{ number_format($tarif->harga_per_kg, 0, ',', '.') }} / kg
+                                    </p>
+                                </div>
 
-                <p class="mt-2 text-sm leading-6 text-slate-600">
-                    Placeholder untuk pengecekan tarif, validasi data pesanan, dan pengawasan operasional.
+                                <div class="flex flex-col gap-2 sm:flex-row">
+                                    <form method="POST" action="{{ route('supervisor.approval.approve', ['type' => 'tarif', 'id' => $tarif->id_tarif]) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="w-full rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-extrabold text-white transition hover:bg-blue-700">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" action="{{ route('supervisor.approval.reject', ['type' => 'tarif', 'id' => $tarif->id_tarif]) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="alasan_reject" value="Tarif tidak disetujui.">
+                                        <button type="submit" class="w-full rounded-xl bg-red-600 px-4 py-2.5 text-xs font-extrabold text-white transition hover:bg-red-700">
+                                            Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
+                            Tidak ada tarif yang menunggu approval.
+                        </p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="mb-5">
+                    <h2 class="text-xl font-extrabold text-slate-950">
+                        Approval Kurir
+                    </h2>
+                    <p class="mt-2 text-sm text-slate-500">
+                        Kurir tidak bisa login aktif sebelum disetujui supervisor atau owner.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    @forelse($pendingKurir as $kurir)
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div>
+                                    <p class="font-extrabold text-slate-950">
+                                        {{ $kurir->nama_lengkap }}
+                                    </p>
+                                    <p class="mt-1 text-sm text-slate-500">
+                                        {{ $kurir->email }} · {{ $kurir->no_hp ?? '-' }}
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-col gap-2 sm:flex-row">
+                                    <form method="POST" action="{{ route('supervisor.approval.approve', ['type' => 'kurir', 'id' => $kurir->id_user]) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="w-full rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-extrabold text-white transition hover:bg-blue-700">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" action="{{ route('supervisor.approval.reject', ['type' => 'kurir', 'id' => $kurir->id_user]) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="alasan_reject" value="Kurir tidak disetujui.">
+                                        <button type="submit" class="w-full rounded-xl bg-red-600 px-4 py-2.5 text-xs font-extrabold text-white transition hover:bg-red-700">
+                                            Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
+                            Tidak ada kurir yang menunggu approval.
+                        </p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="mb-5">
+                <h2 class="text-xl font-extrabold text-slate-950">
+                    Activity Log Terbaru
+                </h2>
+                <p class="mt-2 text-sm text-slate-500">
+                    Riwayat aktivitas approval dan aksi penting sistem.
                 </p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[720px] text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50 text-slate-600">
+                            <th class="px-4 py-3 font-bold">Waktu</th>
+                            <th class="px-4 py-3 font-bold">Aksi</th>
+                            <th class="px-4 py-3 font-bold">Deskripsi</th>
+                            <th class="px-4 py-3 font-bold">User</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($logs as $log)
+                            <tr>
+                                <td class="px-4 py-4 text-slate-600">
+                                    {{ $log->created_at ? $log->created_at->format('d-m-Y H:i') : '-' }}
+                                </td>
+                                <td class="px-4 py-4 font-bold text-slate-950">
+                                    {{ $log->action }}
+                                </td>
+                                <td class="px-4 py-4 text-slate-600">
+                                    {{ $log->description }}
+                                </td>
+                                <td class="px-4 py-4 text-slate-600">
+                                    {{ $log->user->nama_lengkap ?? '-' }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-4 py-10 text-center text-slate-500">
+                                    Belum ada activity log.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

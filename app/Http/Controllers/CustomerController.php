@@ -46,11 +46,15 @@ class CustomerController extends Controller
     public function cekOngkir()
     {
         $kecamatanAsal = Tarif::select('kecamatan_asal')
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->distinct()
             ->orderBy('kecamatan_asal')
             ->pluck('kecamatan_asal');
 
         $kecamatanTujuan = Tarif::select('kecamatan_tujuan')
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->distinct()
             ->orderBy('kecamatan_tujuan')
             ->pluck('kecamatan_tujuan');
@@ -84,17 +88,23 @@ class CustomerController extends Controller
         ]);
 
         $kecamatanAsal = Tarif::select('kecamatan_asal')
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->distinct()
             ->orderBy('kecamatan_asal')
             ->pluck('kecamatan_asal');
 
         $kecamatanTujuan = Tarif::select('kecamatan_tujuan')
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->distinct()
             ->orderBy('kecamatan_tujuan')
             ->pluck('kecamatan_tujuan');
 
         $tarif = Tarif::whereRaw('LOWER(kecamatan_asal) = ?', [strtolower($request->kecamatan_asal)])
             ->whereRaw('LOWER(kecamatan_tujuan) = ?', [strtolower($request->kecamatan_tujuan)])
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->first();
 
         if (!$tarif) {
@@ -123,11 +133,15 @@ class CustomerController extends Controller
     public function buatPesanan()
     {
         $kecamatanAsal = Tarif::select('kecamatan_asal')
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->distinct()
             ->orderBy('kecamatan_asal')
             ->pluck('kecamatan_asal');
 
         $kecamatanTujuan = Tarif::select('kecamatan_tujuan')
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->distinct()
             ->orderBy('kecamatan_tujuan')
             ->pluck('kecamatan_tujuan');
@@ -183,12 +197,14 @@ class CustomerController extends Controller
 
         $tarif = Tarif::whereRaw('LOWER(kecamatan_asal) = ?', [strtolower($request->kecamatan_asal)])
             ->whereRaw('LOWER(kecamatan_tujuan) = ?', [strtolower($request->kecamatan_tujuan)])
+            ->where('approval_status', 'approved')
+            ->where('status_tarif', 'aktif')
             ->first();
 
         if (!$tarif) {
             return back()
                 ->withErrors([
-                    'kecamatan_tujuan' => 'Pesanan tidak bisa dibuat karena tarif untuk rute tersebut belum tersedia.',
+                    'kecamatan_tujuan' => 'Pesanan tidak bisa dibuat karena tarif untuk rute tersebut belum tersedia atau belum disetujui.',
                 ])
                 ->withInput();
         }
