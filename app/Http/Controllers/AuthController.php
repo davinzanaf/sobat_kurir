@@ -10,16 +10,28 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
+        if (session()->has('id_user') && session()->has('role')) {
+            return $this->redirectByRole(session('role'));
+        }
+
         return view('auth.login');
     }
 
     public function showAdminLogin()
     {
+        if (session()->has('id_user') && session()->has('role')) {
+            return $this->redirectByRole(session('role'));
+        }
+
         return view('auth.login');
     }
 
     public function showKurirLogin()
     {
+        if (session()->has('id_user') && session()->has('role')) {
+            return $this->redirectByRole(session('role'));
+        }
+
         return view('auth.login');
     }
 
@@ -228,16 +240,10 @@ class AuthController extends Controller
             'id_user' => $user->id_user,
             'role' => $user->role,
             'nama_lengkap' => $user->nama_lengkap,
+            'email' => $user->email,
         ]);
 
-        return match ($user->role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'kurir' => redirect()->route('kurir.dashboard'),
-            'customer' => redirect()->route('customer.dashboard'),
-            default => back()->withErrors([
-                'email' => 'Email atau password salah.',
-            ]),
-        };
+        return $this->redirectByRole($user->role);
     }
 
     public function adminLogin(Request $request)
@@ -256,5 +262,19 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('home');
+    }
+
+    private function redirectByRole(string $role)
+    {
+        return match ($role) {
+            'owner' => redirect('/owner/dashboard'),
+            'supervisor' => redirect('/supervisor/dashboard'),
+            'admin' => redirect('/admin/dashboard'),
+            'kurir' => redirect('/kurir/dashboard'),
+            'customer' => redirect('/customer/dashboard'),
+            default => redirect('/login')->withErrors([
+                'email' => 'Email atau password salah.',
+            ]),
+        };
     }
 }

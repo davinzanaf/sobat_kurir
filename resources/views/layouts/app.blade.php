@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('register.kurir') }}" class="hidden text-sm font-bold text-slate-600 transition hover:text-blue-600 sm:inline-flex">
+                        <a href="{{ route('kurir.daftar') }}" class="hidden text-sm font-bold text-slate-600 transition hover:text-blue-600 sm:inline-flex">
                             Daftar Kurir
                         </a>
 
@@ -179,7 +179,7 @@
                 <div class="flex flex-wrap gap-5">
                     <a href="{{ route('customer.cek-ongkir') }}" class="hover:text-blue-600">Cek Ongkir</a>
                     <a href="{{ route('customer.tracking') }}" class="hover:text-blue-600">Tracking</a>
-                    <a href="{{ route('register.kurir') }}" class="hover:text-blue-600">Daftar Kurir</a>
+                    <a href="{{ route('kurir.daftar') }}" class="hover:text-blue-600">Daftar Kurir</a>
                 </div>
             </div>
         </footer>

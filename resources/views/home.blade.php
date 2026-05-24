@@ -232,7 +232,7 @@
                     </div>
 
                     <div class="flex md:justify-end">
-                        <a href="{{ route('register.kurir') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-7 py-4 text-sm font-extrabold text-white transition hover:bg-blue-500 sm:w-auto">
+                        <a href="{{ route('kurir.daftar') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-7 py-4 text-sm font-extrabold text-white transition hover:bg-blue-500 sm:w-auto">
                             Daftar Sekarang
                         </a>
                     </div>
