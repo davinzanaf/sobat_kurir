@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
 
 class Pengguna extends Model
 {
+    use HasApiTokens;
     use SoftDeletes;
 
     protected $table = 'tabel_users';
@@ -19,6 +21,10 @@ class Pengguna extends Model
     protected $keyType = 'int';
 
     public $timestamps = false;
+
+    protected $hidden = [
+        'password',
+    ];
 
     protected $fillable = [
         'nama_lengkap',
