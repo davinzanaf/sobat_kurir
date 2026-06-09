@@ -144,13 +144,15 @@ http://127.0.0.1:8000
 
 ## 👤 Role Pengguna
 
-Aplikasi ini memiliki beberapa role pengguna, yaitu:
+Aplikasi ini memiliki 5 role pengguna, yaitu:
 
-| Role     | Keterangan                                    |
-| -------- | --------------------------------------------- |
-| Admin    | Mengelola data dan memantau proses pengiriman |
-| Customer | Membuat pesanan dan melacak paket             |
-| Kurir    | Mengelola status pengiriman paket             |
+| Role       | Keterangan                                                       |
+| ---------- | ---------------------------------------------------------------- |
+| Owner      | Memantau keseluruhan data dan perkembangan sistem                |
+| Supervisor | Mengawasi proses operasional dan kinerja pengguna                |
+| Admin      | Mengelola data utama, pesanan, dan kebutuhan administrasi sistem |
+| Kurir      | Mengelola proses pengiriman dan memperbarui status paket         |
+| Customer   | Membuat pesanan, mengecek ongkir, dan melacak paket              |
 
 ---
 
