@@ -52,7 +52,7 @@ class ApiClient {
     return _decodeResponse(response);
   }
 
-  static Future<Map<String, String>> _headers({required bool auth}) async {
+  static Future<Map<String, String>> _headers({required bool auth})async {
     final headers = <String, String>{
       'Accept': 'application/json',
       'Content-Type': 'application/json',

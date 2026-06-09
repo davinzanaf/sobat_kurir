@@ -24,7 +24,9 @@ class _CustomerRiwayatPesananScreenState
     futurePesanan = getRiwayatPesanan();
   }
 
-  Future<List<Map<String, dynamic>>> getRiwayatPesanan({String query = ''}) async {
+  Future<List<Map<String, dynamic>>> getRiwayatPesanan({
+    String query = '',
+  }) async {
     final encodedQuery = Uri.encodeQueryComponent(query.trim());
 
     final endpoint = encodedQuery.isEmpty
@@ -55,13 +57,17 @@ class _CustomerRiwayatPesananScreenState
 
   void searchPesanan() {
     setState(() {
-      futurePesanan = getRiwayatPesanan(query: searchController.text);
+      futurePesanan = getRiwayatPesanan(
+        query: searchController.text,
+      );
     });
   }
 
   void refreshPesanan() {
     setState(() {
-      futurePesanan = getRiwayatPesanan(query: searchController.text);
+      futurePesanan = getRiwayatPesanan(
+        query: searchController.text,
+      );
     });
   }
 
@@ -139,6 +145,7 @@ class _CustomerRiwayatPesananScreenState
 
             return PesananCard(
               item: item,
+              showCopyResiButton: true,
               action: OutlinedButton.icon(
                 onPressed: () {
                   Navigator.push(
@@ -167,7 +174,9 @@ class _CustomerRiwayatPesananScreenState
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Expanded(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
             }
 
